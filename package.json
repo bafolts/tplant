@@ -1,0 +1,29 @@
+{
+  "name": "tplant",
+  "version": "1.0.0",
+  "description": "Typescript to plantuml",
+  "main": "index.js",
+  "dependencies": {
+    "esprima": "^3.1.2",
+    "typescript": "^2.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bafolts/tplant.git"
+  },
+  "keywords": [
+    "plantuml",
+    "typescript",
+    "uml"
+  ],
+  "author": "Brian Folts",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bafolts/tplant/issues"
+  },
+  "homepage": "https://github.com/bafolts/tplant#readme"
+}
