@@ -23,14 +23,22 @@ function generateDocumentation(fileNames, options) {
 
     // Visit every sourceFile in the program
     for (const sourceFile of program.getSourceFiles()) {
-        // Walk the tree to search for classes
-        ts.forEachChild(sourceFile, visit);
+
+        if (!isInternalTypeScriptFile(sourceFile)) {
+            // Walk the tree to search for classes
+            ts.forEachChild(sourceFile, visit);
+        }
     }
 
     convertToPlant(output);
 
     return;
- 
+
+    /** don't use interfaces from typescript */
+    function isInternalTypeScriptFile(sourceFile) {
+        return sourceFile.fileName.endsWith("/tplant/node_modules/typescript/lib/lib.d.ts");
+    }
+
     /** visit nodes finding exported classes */    
     function visit(node) {
         // Only consider exported nodes
@@ -43,6 +51,9 @@ function generateDocumentation(fileNames, options) {
             output.push(serializeClass(symbol));
             // No need to walk any further, class expressions/inner declarations
             // cannot be exported
+        } else if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
+            let symbol = checker.getSymbolAtLocation(node.name);
+            output.push(serializeInterface(symbol));
         }
         else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
             // This is a namespace, visit its children
@@ -114,10 +125,16 @@ function generateDocumentation(fileNames, options) {
             kind = symbol.valueDeclaration.kind;
         }
 
+
+
         if (kind === ts.SyntaxKind.PropertyDeclaration) {
             return PROPERTY_TYPE;
         } else if (kind === ts.SyntaxKind.MethodDeclaration) {
             return METHOD_TYPE;
+        } else if (kind === ts.SyntaxKind.MethodSignature) {
+            return METHOD_TYPE;
+        } else if (kind === ts.SyntaxKind.PropertySignature) {
+            return PROPERTY_TYPE;
         }
 
         throw new Error("unable to determine member type");
@@ -155,9 +172,25 @@ function generateDocumentation(fileNames, options) {
         return heritageClause.types[0].expression.text;
     }
 
+    function serializeInterface(symbol) {
+        var result = {
+            structure: "interface",
+            name: symbol.name,
+            members: []
+        };
+
+        for (var memberName in symbol.members) {
+            result.members.push(serializeMember(symbol.members[memberName]));
+        }
+
+        return result;
+    }
+
     /** Serialize a class symbol infomration */
     function serializeClass(symbol) {
         let details = serializeSymbol(symbol);
+
+        details.structure = "class";
 
         if (symbol.valueDeclaration && symbol.valueDeclaration.heritageClauses &&
                 symbol.valueDeclaration.heritageClauses.length) {

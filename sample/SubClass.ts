@@ -1,11 +1,14 @@
 
-import { Class } from "./Class";
+import { Test } from "./Class";
 
 interface Interface {
 
+    someAttribute(): void;
+    someProperty: number;
+
 }
 
-class SubClass extends Class implements Interface {
+class SubClass extends Test implements Interface {
 
 }
 

@@ -1,3 +1,4 @@
+"use strict";
 
 var os = require("os");
 
@@ -15,7 +16,17 @@ module.exports = function (tsjs) {
 
     tsjs.forEach(function (c) {
 
-        lines.push("class " + c.name + " {");
+        let heritage = "";
+
+        if (c.extends) {
+            heritage += " extends " + c.extends;
+        }
+
+        if (c.implements) {
+            heritage += " implements " + c.implements.join(", ");
+        }
+
+        lines.push(c.structure + " " + c.name + heritage + " {");
 
         c.members.forEach(function (m) {
 
@@ -39,17 +50,6 @@ module.exports = function (tsjs) {
         }); 
 
         lines.push("}");
-    });
-
-    tsjs.forEach(function (c) {
-        if (c.extends) {
-            lines.push(c.name + " --|> " + c.extends);
-        }
-        if (c.implements) {
-            c.implements.forEach(function (implement) {
-                lines.push(c.name + " --|> " + implement);
-            });
-        }
     });
 
     lines.push("@enduml");
