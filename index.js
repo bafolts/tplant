@@ -147,9 +147,34 @@ function generateDocumentation(fileNames, options) {
         throw new Error("unable to determine member modifier type");
     }
 
+    function getExtendsClassName(heritageClause) {
+        return heritageClause.types[0].expression.text;
+    }
+
+    function getInterfaceName(heritageClause) {
+        return heritageClause.types[0].expression.text;
+    }
+
     /** Serialize a class symbol infomration */
     function serializeClass(symbol) {
         let details = serializeSymbol(symbol);
+
+        if (symbol.valueDeclaration && symbol.valueDeclaration.heritageClauses &&
+                symbol.valueDeclaration.heritageClauses.length) {
+            symbol.valueDeclaration.heritageClauses.forEach(function (heritageClause) {
+                if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
+                    details["extends"] = getExtendsClassName(heritageClause);
+                } else if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
+                    if (details["implements"]) {
+                        details["implements"].push(getInterfaceName(heritageClause));
+                    } else {
+                        details["implements"] = [getInterfaceName(heritageClause)];
+                    }
+                } else {
+                    throw new Error("unsupported heritage clause");
+                }
+            });
+        }
 
         // Get the construct signatures
         let constructorType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);

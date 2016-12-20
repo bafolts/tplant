@@ -39,7 +39,17 @@ module.exports = function (tsjs) {
         }); 
 
         lines.push("}");
+    });
 
+    tsjs.forEach(function (c) {
+        if (c.extends) {
+            lines.push(c.name + " --|> " + c.extends);
+        }
+        if (c.implements) {
+            c.implements.forEach(function (implement) {
+                lines.push(c.name + " --|> " + implement);
+            });
+        }
     });
 
     lines.push("@enduml");
