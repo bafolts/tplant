@@ -6,6 +6,6 @@ Will convert a typescript file to a plantuml file.
 ## usage
 
 ```
-node index.ts sample/Class.ts
+./bin/tplant.js -i sample/SubClass.ts
 ```
 

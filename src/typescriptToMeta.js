@@ -3,8 +3,6 @@
 var fs = require("fs");
 var ts = require("typescript");
 
-var convertToPlant = require("./convertToPlant");
-
 var PUBLIC_TYPE = "public";
 var PRIVATE_TYPE = "private";
 var PROTECTED_TYPE = "protected";
@@ -30,9 +28,7 @@ function generateDocumentation(fileNames, options) {
         }
     }
 
-    convertToPlant(output);
-
-    return;
+    return output;
 
     /** don't use interfaces from typescript */
     function isInternalTypeScriptFile(sourceFile) {
@@ -90,8 +86,6 @@ function generateDocumentation(fileNames, options) {
             return checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
         } else if (getMemberType(symbol) === METHOD_TYPE) {
             return getReturnTypeOfFunction(checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration)));
-        } else {
-            throw new Error("Don't know how to get this return type");
         }
 
     }
@@ -102,7 +96,7 @@ function generateDocumentation(fileNames, options) {
         if (parsedType.length === 0) {
             return [];
         }
-        var parameters = parsedType.split(",");
+        var parameters = parsedType.split(", ");
         return parameters.map(function (parameter) {
             return {
                 name: parameter.substring(0, parameter.indexOf(":")),
@@ -125,8 +119,6 @@ function generateDocumentation(fileNames, options) {
             kind = symbol.valueDeclaration.kind;
         }
 
-
-
         if (kind === ts.SyntaxKind.PropertyDeclaration) {
             return PROPERTY_TYPE;
         } else if (kind === ts.SyntaxKind.MethodDeclaration) {
@@ -136,8 +128,6 @@ function generateDocumentation(fileNames, options) {
         } else if (kind === ts.SyntaxKind.PropertySignature) {
             return PROPERTY_TYPE;
         }
-
-        throw new Error("unable to determine member type");
 
     }
 
@@ -226,8 +216,7 @@ function generateDocumentation(fileNames, options) {
     function serializeSignature(signature) {
         return {
             parameters: signature.parameters.map(serializeSymbol),
-            returnType: checker.typeToString(signature.getReturnType()),
-            // documentation: ts.displayPartsToString(signature.getDocumentationComment())
+            returnType: checker.typeToString(signature.getReturnType())
         };
     }
 
@@ -237,10 +226,10 @@ function generateDocumentation(fileNames, options) {
     }
 }
 
-var inputFiles = [process.argv[2]];
-
-generateDocumentation(inputFiles, {
-    target: ts.ScriptTarget.ES6,
-    module: ts.ModuleKind.CommonJS
-});
+module.exports = function (inputFile) {
+    return generateDocumentation([inputFile], {
+        target: ts.ScriptTarget.ES6,
+        module: ts.ModuleKind.CommonJS
+    });
+}
 

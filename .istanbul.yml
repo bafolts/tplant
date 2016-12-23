@@ -1,0 +1,14 @@
+
+verbose: false
+instrumentation:
+    extensions:
+        - .js 
+    excludes: ["node_modules/**/*", "test/**/*"]
+    default-excludes: false
+reporting:
+    print: summary
+    reports:
+        - lcov
+        - html
+        - text
+    dir: ./coverage

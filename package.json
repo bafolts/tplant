@@ -1,15 +1,20 @@
 {
   "name": "tplant",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Typescript to plantuml",
   "main": "index.js",
   "dependencies": {
     "esprima": "^3.1.2",
     "typescript": "^2.1.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "commander": "^2.9.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "istanbul cover _mocha"
   },
   "repository": {
     "type": "git",
