@@ -1,7 +1,15 @@
 
 class Test {
 
+    constructor() {
+
+    }
+
     someOtherPublic(): void {
+
+    }
+
+    missingType() {
 
     }
 

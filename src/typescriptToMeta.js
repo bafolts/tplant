@@ -21,19 +21,13 @@ function generateDocumentation(fileNames, options) {
 
     // Visit every sourceFile in the program
     for (const sourceFile of program.getSourceFiles()) {
-
-        if (!isInternalTypeScriptFile(sourceFile)) {
+        if (!sourceFile.isDeclarationFile) {
             // Walk the tree to search for classes
             ts.forEachChild(sourceFile, visit);
         }
     }
 
     return output;
-
-    /** don't use interfaces from typescript */
-    function isInternalTypeScriptFile(sourceFile) {
-        return sourceFile.fileName.endsWith("/tplant/node_modules/typescript/lib/lib.d.ts");
-    }
 
     /** visit nodes finding exported classes */    
     function visit(node) {

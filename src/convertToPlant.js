@@ -54,7 +54,7 @@ module.exports = function (tsjs) {
 
     lines.push("@enduml");
 
-    console.log(lines.join(os.EOL));
+    return lines.join(os.EOL);
 
 };
 

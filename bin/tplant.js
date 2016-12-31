@@ -5,7 +5,7 @@ var convertToPlant = require("../src/convertToPlant");
 var typescriptToMeta = require("../src/typescriptToMeta");
 
 program
-    .version("1.0.2")
+    .version("1.0.4")
     .usage("[options]")
     .option('-i, --input [string]', 'input file')
     .parse(process.argv);
@@ -15,7 +15,7 @@ if (!program.input) {
     process.exit(1);
 }
 
-convertToPlant(
+console.log(convertToPlant(
     typescriptToMeta(program.input)
-);
+));
 

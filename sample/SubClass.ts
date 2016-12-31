@@ -5,6 +5,7 @@ interface Interface {
 
     someAttribute(): void;
     someProperty: number;
+    missingType();
 
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "tplant",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Typescript to plantuml",
   "main": "index.js",
   "dependencies": {
