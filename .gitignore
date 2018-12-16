@@ -1,3 +1,8 @@
+#Compiled files
+dist
+*.js
+!*.spec.js
+
 # Logs
 logs
 *.log

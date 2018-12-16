@@ -1,15 +1,12 @@
-
-var expect = require("chai").expect;
+var assert = require('assert');
 var typescriptToMeta = require("../src/typescriptToMeta");
 var convertToPlant = require("../src/convertToPlant");
 
-describe("parser", function() {
+describe("parser", function () {
 
-    it("generate plantuml for sample/SubClass", function() {
-        expect(
-                convertToPlant(typescriptToMeta("sample/SubClass.ts"))
-              ).to.equal(
-`@startuml
+	it("generate plantuml for sample/SubClass", function () {
+		assert.equal(convertToPlant(typescriptToMeta("sample/SubClass.ts")),
+			`@startuml
 class Test {
 	+__constructor: undefined
 	+someOtherPublic(): void
@@ -28,7 +25,6 @@ interface Interface {
 class SubClass extends Test implements Interface {
 }
 @enduml`);
-   });
+	});
 
 });
-
