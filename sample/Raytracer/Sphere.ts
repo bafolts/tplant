@@ -1,3 +1,8 @@
+import { Thing } from "./Thing";
+import { Vector } from "./Vector";
+import { Surface } from "./Surface";
+import { Ray } from "./Ray";
+
 export class Sphere implements Thing {
 
     radius2: number;

@@ -12,12 +12,14 @@ export interface ISerializeInterface extends ISerializeSymbol {
 export interface ISerializeClass extends ISerializeInterface {
     implements?: string[];
     constructors: Array<{ parameters: ISerializeSymbol[], returnType: string }>;
+    keyword?: string
 }
 
 export interface ISerializeMember extends ISerializeSymbol {
     modifierType: string;
-    returnType: string;
+    returnType?: string;
     parameters: ISerializeSymbol[];
+    keyword?: string;
 }
 
 export interface ISerializeSignature {

@@ -7,6 +7,7 @@ const TYPES: { [type: string]: string } = {
     "protected": "#"
 };
 
+//@TODO: Don't use any type
 export default function convertToPlant(tsjs: any[]): string {
 
     const lines: string[] = [];
@@ -14,6 +15,11 @@ export default function convertToPlant(tsjs: any[]): string {
     lines.push("@startuml");
 
     tsjs.forEach(function (serializedSymbol: any): void {
+
+        let keyword: string = "";
+        if (serializedSymbol.keyword !== undefined) {
+            keyword = `${serializedSymbol.keyword} `;
+        }
 
         let heritage: string = "";
 
@@ -25,13 +31,17 @@ export default function convertToPlant(tsjs: any[]): string {
             heritage += " implements " + serializedSymbol.implements.join(", ");
         }
 
-        lines.push(serializedSymbol.structure + " " + serializedSymbol.name + heritage + " {");
+        lines.push(`${keyword}${serializedSymbol.structure} ${serializedSymbol.name}${heritage} {`);
 
         serializedSymbol.members.forEach(function (serializedMember: ISerializeMember): void {
 
             let line: string = "\t";
 
             line += TYPES[serializedMember.modifierType];
+
+            if (serializedMember.keyword !== undefined) {
+                line += `{${serializedMember.keyword}} `;
+            }
 
             line += serializedMember.name;
 

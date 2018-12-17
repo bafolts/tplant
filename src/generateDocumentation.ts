@@ -6,7 +6,10 @@ enum TYPES {
     PRIVATE = "private",
     PROTECTED = "protected",
     PROPERTY = "property",
-    METHOD = "method"
+    METHOD = "method",
+    CONSTRUCTOR = "constructor",
+    ABSTRACT = "abstract",
+    STATIC = "static"
 }
 
 export default function generateDocumentation(fileNames: ReadonlyArray<string>, options: ts.CompilerOptions = {
@@ -39,8 +42,12 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
             return;
         }
         if (node.kind === ts.SyntaxKind.ClassDeclaration) {
+            const currentNode: ts.ClassLikeDeclarationBase = <ts.ClassLikeDeclarationBase>node;
+            if (currentNode.name === undefined) {
+                return;
+            }
             // This is a top level class, get its symbol
-            const symbol: ts.Symbol | undefined = checker.getSymbolAtLocation(node);
+            const symbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
             if (symbol === undefined) {
                 return;
             }
@@ -50,7 +57,8 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
             return;
         }
         if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
-            const symbol: ts.Symbol | undefined = checker.getSymbolAtLocation(node);
+            const currentNode: ts.InterfaceDeclaration = <ts.InterfaceDeclaration>node;
+            const symbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
             if (symbol === undefined) {
                 return;
             }
@@ -61,6 +69,7 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
             // This is a namespace, visit its children
             ts.forEachChild(<ts.ModuleDeclaration>node, visit);
         }
+        //@TODO: ts.SyntaxKind.EnumDeclaration
     }
 
     /** Serialize a symbol into a json object */
@@ -74,10 +83,11 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
     function serializeMember(symbol: ts.Symbol): ISerializeMember {
         let result: ISerializeMember = {
             name: symbol.getName(),
-            type: getMemberType(symbol) || '',
+            type: getMemberType(symbol),
             modifierType: getMemberModifierType(symbol),
-            returnType: getMemberReturnType(symbol) || '',
-            parameters: []
+            returnType: getMemberReturnType(symbol),
+            parameters: [],
+            keyword: getMemberKeyword(symbol)
         };
 
         if (result.type === TYPES.METHOD) {
@@ -87,7 +97,7 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
         return result;
     }
 
-    function getMemberReturnType(symbol: ts.Symbol): string | void {
+    function getMemberReturnType(symbol: ts.Symbol): string | undefined {
         if (getMemberType(symbol) === TYPES.PROPERTY) {
             return checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
         }
@@ -103,7 +113,7 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
             return [];
         }
         const parameters: string[] = parsedType.split(", ");
-        return parameters.map(function (parameter) {
+        return parameters.map((parameter: string): ISerializeSymbol => {
             return {
                 name: parameter.substring(0, parameter.indexOf(":")),
                 type: parameter.substring(parameter.indexOf(":") + 2)
@@ -115,45 +125,96 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
         return typeString.substring(typeString.lastIndexOf(" => ") + 4);
     }
 
-    function getMemberType(symbol: ts.Symbol): string | void {
-        if (!symbol.valueDeclaration) {
-            return;
+    function getMemberType(symbol: ts.Symbol): TYPES {
+        if (symbol.valueDeclaration) {
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.PropertyDeclaration ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.PropertySignature ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
+                return TYPES.PROPERTY;
+            }
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.MethodDeclaration ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.MethodSignature) {
+                return TYPES.METHOD;
+            }
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.Constructor) {
+                return TYPES.CONSTRUCTOR;
+            }
+        } else if (symbol.declarations && symbol.declarations.length) {
+            let kind: TYPES | undefined;
+            symbol.declarations.forEach((declaration: ts.Declaration): void => {
+                if (declaration.kind === ts.SyntaxKind.PropertyDeclaration ||
+                    declaration.kind === ts.SyntaxKind.PropertySignature ||
+                    declaration.kind === ts.SyntaxKind.Parameter) {
+                    kind = TYPES.PROPERTY;
+                    return;
+                }
+                if (declaration.kind === ts.SyntaxKind.MethodDeclaration ||
+                    declaration.kind === ts.SyntaxKind.MethodSignature) {
+                    kind = TYPES.METHOD;
+                    return;
+                }
+                if (declaration.kind === ts.SyntaxKind.Constructor) {
+                    kind = TYPES.CONSTRUCTOR;
+                    return;
+                }
+            });
+            if (kind === undefined) {
+                throw new Error("unable to determine member type");
+            }
+            return kind;
         }
 
-        if (symbol.valueDeclaration.kind === ts.SyntaxKind.PropertyDeclaration) {
-            return TYPES.PROPERTY;
-        }
-        if (symbol.valueDeclaration.kind === ts.SyntaxKind.MethodDeclaration) {
-            return TYPES.METHOD;
-        }
-        if (symbol.valueDeclaration.kind === ts.SyntaxKind.MethodSignature) {
-            return TYPES.METHOD;
-        }
-        if (symbol.valueDeclaration.kind === ts.SyntaxKind.PropertySignature) {
-            return TYPES.PROPERTY;
-        }
+        throw new Error("unable to determine member type");
     }
 
-    function getMemberModifierType(symbol: ts.Symbol): string {
+    function getMemberModifierType(symbol: ts.Symbol): TYPES {
+        let keyword: TYPES = TYPES.PUBLIC;
+
         if (!symbol.valueDeclaration ||
             !symbol.valueDeclaration.modifiers ||
             !symbol.valueDeclaration.modifiers.length) {
-            return TYPES.PUBLIC;
+            return keyword;
         }
 
-        const kind: ts.SyntaxKind = symbol.valueDeclaration.modifiers[0].kind;
+        symbol.valueDeclaration.modifiers.forEach((modifier: ts.Modifier): void => {
+            if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
+                keyword = TYPES.PRIVATE;
+                return;
+            }
+            if (modifier.kind === ts.SyntaxKind.PublicKeyword) {
+                keyword = TYPES.PUBLIC;
+                return;
+            }
+            if (modifier.kind === ts.SyntaxKind.ProtectedKeyword) {
+                keyword = TYPES.PROTECTED;
+                return;
+            }
+        });
 
-        if (kind === ts.SyntaxKind.PrivateKeyword) {
-            return TYPES.PRIVATE;
-        }
-        if (kind === ts.SyntaxKind.PublicKeyword) {
-            return TYPES.PUBLIC;
-        }
-        if (kind === ts.SyntaxKind.ProtectedKeyword) {
-            return TYPES.PROTECTED;
+        return keyword;
+    }
+
+    function getMemberKeyword(symbol: ts.Symbol): TYPES | undefined {
+        let keyword: TYPES | undefined;
+
+        if (!symbol.valueDeclaration ||
+            !symbol.valueDeclaration.modifiers ||
+            !symbol.valueDeclaration.modifiers.length) {
+            return keyword;
         }
 
-        throw new Error("unable to determine member modifier type");
+        symbol.valueDeclaration.modifiers.forEach((modifier: ts.Modifier): void => {
+            if (modifier.kind === ts.SyntaxKind.AbstractKeyword) {
+                keyword = TYPES.ABSTRACT;
+                return;
+            }
+            if (modifier.kind === ts.SyntaxKind.StaticKeyword) {
+                keyword = TYPES.STATIC;
+                return;
+            }
+        });
+
+        return keyword;
     }
 
     function getExtendsClassName(heritageClause: ts.HeritageClause): string {
@@ -165,6 +226,7 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
     }
 
     function serializeInterface(symbol: ts.Symbol): ISerializeInterface {
+        //@TODO: Generic
         const serializedInterface: ISerializeInterface = {
             ...serializeSymbol(symbol),
             structure: "interface",
@@ -188,11 +250,13 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
         // Get the construct signatures
         const constructorType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
 
+        //@TODO: Generic
         let details: ISerializeClass = {
             ...serializeSymbol(symbol),
             structure: "class",
             constructors: constructorType.getConstructSignatures().map(serializeSignature),
-            members: []
+            members: [],
+            keyword: getMemberKeyword(symbol)
         };
 
         if (symbol.members !== undefined) {
@@ -207,7 +271,7 @@ export default function generateDocumentation(fileNames: ReadonlyArray<string>, 
             return details;
         }
 
-        clauses.forEach(function (heritageClause: ts.HeritageClause) {
+        clauses.forEach((heritageClause: ts.HeritageClause): void => {
             if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
                 details.extends = getExtendsClassName(heritageClause);
                 return;

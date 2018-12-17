@@ -1,3 +1,5 @@
+import { Vector } from "./Vector";
+
 export class Camera {
 
     forward: Vector;

@@ -1,3 +1,9 @@
+import { Thing } from "./Thing";
+import { Vector } from "./Vector";
+import { Ray } from "./Ray";
+import { Intersection } from "./Intersection";
+import { Surface } from "./Surface";
+
 export class Plane implements Thing {
 
     normal: (pos: Vector) => Vector;

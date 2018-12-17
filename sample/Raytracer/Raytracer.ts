@@ -1,3 +1,10 @@
+import { Scene } from "./Scene";
+import { Vector } from "./Vector";
+import { Color } from "./Color";
+import { Ray } from "./Ray";
+import { Intersection } from "./Intersection";
+import { Thing } from "./Thing";
+
 export class RayTracer {
 
     private maxDepth = 5;
@@ -39,7 +46,7 @@ export class RayTracer {
         let normal = isect.thing.normal(pos);
         let reflectDir = Vector.minus(d, Vector.times(2, Vector.times(Vector.dot(normal, d), normal)));
         let naturalColor = Color.plus(Color.background,
-                                      this.getNaturalColor(isect.thing, pos, normal, reflectDir, scene));
+            this.getNaturalColor(isect.thing, pos, normal, reflectDir, scene));
         let reflectedColor = (depth >= this.maxDepth) ? Color.grey : this.getReflectionColor(isect.thing, pos, normal, reflectDir, scene, depth);
         return Color.plus(naturalColor, reflectedColor);
     }
@@ -60,12 +67,12 @@ export class RayTracer {
             else {
                 let illum = Vector.dot(livec, norm);
                 let lcolor = (illum > 0) ? Color.scale(illum, light.color)
-                                          : Color.defaultColor;
+                    : Color.defaultColor;
                 let specular = Vector.dot(livec, Vector.norm(rd));
                 let scolor = (specular > 0) ? Color.scale(Math.pow(specular, thing.surface.roughness), light.color)
-                                          : Color.defaultColor;
+                    : Color.defaultColor;
                 return Color.plus(col, Color.plus(Color.times(thing.surface.diffuse(pos), lcolor),
-                                                  Color.times(thing.surface.specular(pos), scolor)));
+                    Color.times(thing.surface.specular(pos), scolor)));
             }
         }
         return scene.lights.reduce(addLight, Color.defaultColor);

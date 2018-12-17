@@ -8,4 +8,3 @@ Will convert a typescript file to a plantuml file.
 ```
 ./bin/tplant.js -i sample/SubClass.ts
 ```
-

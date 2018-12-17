@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:dev": "tsc --sourceMap -w",
     "test": "mocha"
   },
   "repository": {
