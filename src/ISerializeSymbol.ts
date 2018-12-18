@@ -3,6 +3,16 @@ export interface ISerializeSymbol {
     type: string;
 }
 
+export interface ISerializeSignature {
+    parameters: ISerializeSymbol[];
+    returnType: string;
+}
+
+export interface ISerializeMember extends ISerializeSymbol, ISerializeSignature {
+    modifierType: string;
+    keyword?: string;
+}
+
 export interface ISerializeInterface extends ISerializeSymbol {
     structure: string;
     members: ISerializeMember[];
@@ -11,18 +21,23 @@ export interface ISerializeInterface extends ISerializeSymbol {
 
 export interface ISerializeClass extends ISerializeInterface {
     implements?: string[];
-    constructors: Array<{ parameters: ISerializeSymbol[], returnType: string }>;
-    keyword?: string
-}
-
-export interface ISerializeMember extends ISerializeSymbol {
-    modifierType: string;
-    returnType?: string;
-    parameters: ISerializeSymbol[];
+    constructors: ISerializeSignature[];
     keyword?: string;
 }
 
-export interface ISerializeSignature {
-    parameters: ISerializeSymbol[];
-    returnType: string;
+export enum MODIFIER_TYPE {
+    PUBLIC = 'public',
+    PRIVATE = 'private',
+    PROTECTED = 'protected'
+}
+
+export enum MEMBER_TYPE {
+    PROPERTY = 'property',
+    METHOD = 'method',
+    CONSTRUCTOR = 'constructor'
+}
+
+export enum KEYWORD_TYPE {
+    ABSTRACT = 'abstract',
+    STATIC = 'static'
 }
