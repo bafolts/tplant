@@ -348,6 +348,22 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             });
         }
 
+        if ((<ts.ClassLikeDeclarationBase>symbol.valueDeclaration).members !== undefined) {
+            (<ts.ClassLikeDeclarationBase>symbol.valueDeclaration).members.forEach((memberName: ts.ClassElement): void => {
+                const symbol: ts.Symbol | void = checker.getSymbolAtLocation((<ts.MethodDeclaration | ts.PropertyDeclaration>memberName).name);
+                if (symbol === undefined) {
+                    return;
+                }
+                const serializedMember: ISerializeMember | void = serializeMember(symbol);
+                if (serializedMember === undefined) {
+                    return;
+                }
+                if (!details.members.some(e => e.name === serializedMember.name)) {
+                    details.members.push(serializedMember);
+                }
+            });
+        }
+
         const clauses: ts.NodeArray<ts.HeritageClause> | undefined =
             (<ts.ClassLikeDeclarationBase>symbol.valueDeclaration).heritageClauses;
 

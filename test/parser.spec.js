@@ -34,10 +34,10 @@ describe("Parser", () => {
 	it('generate plantuml for Abstract/AbstractClass.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Abstract/AbstractClass.ts"])),
 			['@startuml',
-			'abstract class AbstractClass {',
-			'    +{abstract} ToTest(): any',
-			'}',
-			'@enduml'].join(os.EOL));
+				'abstract class AbstractClass {',
+				'    +{abstract} ToTest(): any',
+				'}',
+				'@enduml'].join(os.EOL));
 	});
 
 	it("generate plantuml for RayTracer", () => {
@@ -47,6 +47,13 @@ describe("Parser", () => {
 				'    +x: number',
 				'    +y: number',
 				'    +z: number',
+				'    +{static} times(k: number, v: Vector): Vector',
+				'    +{static} minus(v1: Vector, v2: Vector): Vector',
+				'    +{static} plus(v1: Vector, v2: Vector): Vector',
+				'    +{static} dot(v1: Vector, v2: Vector): number',
+				'    +{static} mag(v: Vector): number',
+				'    +{static} norm(v: Vector): Vector',
+				'    +{static} cross(v1: Vector, v2: Vector): Vector',
 				'}',
 				'interface Ray {',
 				'    +start: Vector',
@@ -61,6 +68,15 @@ describe("Parser", () => {
 				'    +r: number',
 				'    +g: number',
 				'    +b: number',
+				'    +{static} scale(k: number, v: Color): Color',
+				'    +{static} plus(v1: Color, v2: Color): Color',
+				'    +{static} times(v1: Color, v2: Color): Color',
+				'    +{static} white: Color',
+				'    +{static} grey: Color',
+				'    +{static} black: Color',
+				'    +{static} background: Color',
+				'    +{static} defaultColor: Color',
+				'    +{static} toDrawingColor(c: Color): { r: number; g: number; b: number; }',
 				'}',
 				'interface Surface {',
 				'    +diffuse: (pos: Vector) => Color',
