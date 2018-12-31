@@ -1,11 +1,13 @@
 # tplant
-Typescript to plantuml
+Typescript to PlantUML
 
-Will convert a typescript file to a plantuml file.
+Will convert a Typescript file to a PlantUML file. Following all inheritances.
 
-## usage
+## Usage
 
 ```
 ./bin/tplant.js -i sample/SubClass.ts
 ```
 
+# References
+https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API

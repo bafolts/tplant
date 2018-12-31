@@ -1,3 +1,11 @@
+#Compiled files
+dist
+*.js
+!*.spec.js
+
+#IDE
+.vscode
+
 # Logs
 logs
 *.log
