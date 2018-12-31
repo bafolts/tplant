@@ -14,8 +14,14 @@ export interface ISerializeMember extends ISerializeSymbol, ISerializeSignature 
 }
 
 export interface ISerializeInterface extends ISerializeSymbol {
-    structure: string;
+    structure: STRUCTURE;
     members: ISerializeMember[];
+    extends?: string;
+}
+
+export interface ISerializeEnum extends ISerializeSymbol {
+    structure: STRUCTURE;
+    members: string[];
     extends?: string;
 }
 
@@ -34,10 +40,17 @@ export enum MODIFIER_TYPE {
 export enum MEMBER_TYPE {
     PROPERTY = 'property',
     METHOD = 'method',
-    CONSTRUCTOR = 'constructor'
+    CONSTRUCTOR = 'constructor',
+    INDEX = 'index'
 }
 
 export enum KEYWORD_TYPE {
     ABSTRACT = 'abstract',
     STATIC = 'static'
+}
+
+export enum STRUCTURE {
+    CLASS = 'class',
+    INTERFACE = 'interface',
+    ENUM = 'enum'
 }

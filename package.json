@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --sourceMap -w",
-    "test": "mocha"
+    "test": "tsc && mocha"
   },
   "repository": {
     "type": "git",

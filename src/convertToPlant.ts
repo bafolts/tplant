@@ -1,5 +1,12 @@
 import * as os from 'os';
-import { ISerializeSymbol, ISerializeMember, MODIFIER_TYPE } from './ISerializeSymbol';
+import {
+    ISerializeClass,
+    ISerializeEnum,
+    ISerializeInterface,
+    ISerializeSymbol,
+    MEMBER_TYPE,
+    MODIFIER_TYPE
+} from './ISerializeSymbol';
 
 const TYPES: { [type: string]: string } = {
     [MODIFIER_TYPE.PRIVATE]: '-',
@@ -7,18 +14,17 @@ const TYPES: { [type: string]: string } = {
     [MODIFIER_TYPE.PUBLIC]: '+'
 };
 
-// @TODO: Don't use any type
-export function convertToPlant(tsjs: any[]): string {
+export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISerializeClass)[]): string {
 
     const lines: string[] = [];
 
     lines.push('@startuml');
 
-    tsjs.forEach((serializedSymbol: any): void => {
+    tsjs.forEach((serializedSymbol: ISerializeInterface | ISerializeEnum | ISerializeClass): void => {
 
         let keyword: string = '';
-        if (serializedSymbol.keyword !== undefined) {
-            keyword = `${serializedSymbol.keyword} `;
+        if ((<ISerializeClass>serializedSymbol).keyword !== undefined) {
+            keyword = `${(<ISerializeClass>serializedSymbol).keyword} `;
         }
 
         let heritage: string = '';
@@ -27,15 +33,20 @@ export function convertToPlant(tsjs: any[]): string {
             heritage += ` extends ${serializedSymbol.extends}`;
         }
 
-        if (serializedSymbol.implements !== undefined) {
-            heritage += ` implements ${serializedSymbol.implements.join(', ')}`;
+        const serializedClass: ISerializeClass = <ISerializeClass>serializedSymbol;
+        if (serializedClass.implements !== undefined) {
+            heritage += ` implements ${serializedClass.implements.join(', ')}`;
         }
 
         lines.push(`${keyword}${serializedSymbol.structure} ${serializedSymbol.name}${heritage} {`);
 
-        serializedSymbol.members.forEach((serializedMember: ISerializeMember): void => {
-
-            let line: string = '\t';
+        for (const serializedMember of serializedSymbol.members) {
+            let line: string = `    `;
+            if (typeof serializedMember === 'string') {
+                line += serializedMember;
+                lines.push(line);
+                continue;
+            }
 
             line += TYPES[serializedMember.modifierType];
 
@@ -45,7 +56,7 @@ export function convertToPlant(tsjs: any[]): string {
 
             line += serializedMember.name;
 
-            if (serializedMember.type === 'method') {
+            if (serializedMember.type === MEMBER_TYPE.METHOD) {
                 line += '(';
                 line += serializedMember.parameters.map((parameter: ISerializeSymbol): string => {
                     return `${parameter.name}: ${parameter.type}`;
@@ -54,11 +65,12 @@ export function convertToPlant(tsjs: any[]): string {
                 line += ')';
             }
 
-            line += `: ${serializedMember.returnType}`;
+            if (serializedMember.returnType !== undefined) {
+                line += `: ${serializedMember.returnType}`;
+            }
 
             lines.push(line);
-        });
-
+        }
         lines.push('}');
     });
 

@@ -1,20 +1,22 @@
-import ts from 'typescript';
+import ts, { EnumDeclaration } from 'typescript';
 import {
-    ISerializeSymbol,
-    ISerializeSignature,
-    ISerializeMember,
-    ISerializeInterface,
     ISerializeClass,
-    MODIFIER_TYPE,
+    ISerializeEnum,
+    ISerializeInterface,
+    ISerializeMember,
+    ISerializeSignature,
+    ISerializeSymbol,
+    KEYWORD_TYPE,
     MEMBER_TYPE,
-    KEYWORD_TYPE
+    MODIFIER_TYPE,
+    STRUCTURE
 } from './ISerializeSymbol';
 
 // tslint:disable-next-line max-func-body-length
 export function generateDocumentation(fileNames: ReadonlyArray<string>, options: ts.CompilerOptions = {
     module: ts.ModuleKind.CommonJS,
     target: ts.ScriptTarget.ES2015
-}): ISerializeSymbol[] {
+}): (ISerializeInterface | ISerializeEnum | ISerializeClass)[] {
 
     // Build a program using the set of root file names in fileNames
     const program: ts.Program = ts.createProgram(fileNames, options);
@@ -22,7 +24,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
     // Get the checker, we will use it to find more about classes
     const checker: ts.TypeChecker = program.getTypeChecker();
 
-    const output: ISerializeSymbol[] = [];
+    const output: (ISerializeInterface | ISerializeEnum | ISerializeClass)[] = [];
 
     // Visit every sourceFile in the program
     program.getSourceFiles()
@@ -73,7 +75,16 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             // This is a namespace, visit its children
             ts.forEachChild(<ts.ModuleDeclaration>node, visit);
         }
-        // @TODO: ts.SyntaxKind.EnumDeclaration
+        if (node.kind === ts.SyntaxKind.EnumDeclaration) {
+            const currentNode: ts.EnumDeclaration = <ts.EnumDeclaration>node;
+            const symbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (symbol === undefined) {
+                return;
+            }
+            output.push(serializeEnum(symbol));
+
+            return;
+        }
     }
 
     /**
@@ -86,7 +97,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         };
     }
 
-    function serializeMember(symbol: ts.Symbol): ISerializeMember {
+    function serializeMember(symbol: ts.Symbol): ISerializeMember | void {
         const result: ISerializeMember = {
             keyword: getMemberKeyword(symbol),
             modifierType: getMemberModifierType(symbol),
@@ -95,6 +106,10 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             returnType: getMemberReturnType(symbol),
             type: getMemberType(symbol)
         };
+
+        if (result.type === MEMBER_TYPE.CONSTRUCTOR) {
+            return;
+        }
 
         if (result.type === MEMBER_TYPE.METHOD) {
             result.parameters = getParametersForFunction(
@@ -108,15 +123,20 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
     }
 
     function getMemberReturnType(symbol: ts.Symbol): string {
-        if (getMemberType(symbol) === MEMBER_TYPE.PROPERTY) {
+        const returnType = getMemberType(symbol);
+        if (returnType === MEMBER_TYPE.PROPERTY || returnType === MEMBER_TYPE.INDEX) {
             return checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
         }
-        if (getMemberType(symbol) === MEMBER_TYPE.METHOD) {
+        if (returnType === MEMBER_TYPE.METHOD) {
             return getReturnTypeOfFunction(
                 checker.typeToString(
                     checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration)
                 )
             );
+        }
+        if (returnType === MEMBER_TYPE.CONSTRUCTOR) {
+            // Skip constructors
+            return '';
         }
         throw new Error('unable to determine return type');
     }
@@ -173,6 +193,11 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
                 }
                 if (declaration.kind === ts.SyntaxKind.Constructor) {
                     kind = MEMBER_TYPE.CONSTRUCTOR;
+
+                    return true;
+                }
+                if (declaration.kind === ts.SyntaxKind.IndexSignature) {
+                    kind = MEMBER_TYPE.INDEX;
 
                     return true;
                 }
@@ -257,11 +282,10 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
     }
 
     function serializeInterface(symbol: ts.Symbol): ISerializeInterface {
-        // @TODO: Generic
         const serializedInterface: ISerializeInterface = {
             ...serializeSymbol(symbol),
             members: [],
-            structure: 'interface'
+            structure: STRUCTURE.INTERFACE
         };
 
         if (symbol.members === undefined) {
@@ -269,10 +293,32 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         }
 
         symbol.members.forEach((memberName: ts.Symbol): void => {
-            serializedInterface.members.push(serializeMember(memberName));
+            const serializedMember: ISerializeMember | void = serializeMember(memberName);
+            if (serializedMember === undefined) {
+                return;
+            }
+            serializedInterface.members.push(serializedMember);
         });
 
         return serializedInterface;
+    }
+
+    function serializeEnum(symbol: ts.Symbol): ISerializeEnum {
+        const serializedEnum: ISerializeEnum = {
+            ...serializeSymbol(symbol),
+            members: [],
+            structure: STRUCTURE.ENUM
+        };
+
+        if (symbol.members === undefined) {
+            return serializedEnum;
+        }
+
+        symbol.members.forEach((memberName: ts.Symbol): void => {
+            serializedEnum.members.push(memberName.name);
+        });
+
+        return serializedEnum;
     }
 
     /**
@@ -283,19 +329,22 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         // Get the construct signatures
         const constructorType: ts.Type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
 
-        // @TODO: Generic
         const details: ISerializeClass = {
             ...serializeSymbol(symbol),
             constructors: constructorType.getConstructSignatures()
                 .map(serializeSignature),
             keyword: getMemberKeyword(symbol),
             members: [],
-            structure: 'class'
+            structure: STRUCTURE.CLASS
         };
 
         if (symbol.members !== undefined) {
             symbol.members.forEach((memberName: ts.Symbol): void => {
-                details.members.push(serializeMember(memberName));
+                const serializedMember: ISerializeMember | void = serializeMember(memberName);
+                if (serializedMember === undefined) {
+                    return;
+                }
+                details.members.push(serializedMember);
             });
         }
 
