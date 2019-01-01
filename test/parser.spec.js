@@ -5,7 +5,7 @@ const convertToPlant = require("../dist/convertToPlant");
 
 describe("Parser", () => {
 
-	it('generate plantuml for Classes/Greeter.ts', () => {
+	it('generate PlantUML for Classes/Greeter.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Classes/Greeter.ts"])),
 			['@startuml',
 				'class Greeter {',
@@ -15,7 +15,7 @@ describe("Parser", () => {
 				'@enduml'].join(os.EOL));
 	});
 
-	it('generate plantuml for Inheritance', () => {
+	it('generate PlantUML for Inheritance', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Inheritance/index.ts"])),
 			['@startuml',
 				'class Animal {',
@@ -31,7 +31,7 @@ describe("Parser", () => {
 				'@enduml'].join(os.EOL));
 	});
 
-	it('generate plantuml for Abstract/AbstractClass.ts', () => {
+	it('generate PlantUML for Abstract/AbstractClass.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Abstract/AbstractClass.ts"])),
 			['@startuml',
 				'abstract class AbstractClass {',
@@ -40,7 +40,7 @@ describe("Parser", () => {
 				'@enduml'].join(os.EOL));
 	});
 
-	it("generate plantuml for RayTracer", () => {
+	it("generate PlantUML for RayTracer", () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/RayTracer/index.ts"])),
 			['@startuml',
 				'class Vector {',

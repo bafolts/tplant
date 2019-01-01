@@ -1,7 +1,7 @@
 {
   "name": "tplant",
   "version": "2.0.0",
-  "description": "Typescript to plantuml",
+  "description": "Typescript to PlantUML",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -35,6 +35,7 @@
     "Class Diagram"
   ],
   "author": "Brian Folts",
+  "contributors": ["Marcos V. Rubido <me@marcosvrs.com> (https://marcosvrs.com/)"],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/bafolts/tplant/issues"
