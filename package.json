@@ -1,11 +1,42 @@
 {
   "name": "tplant",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Typescript to PlantUML",
+  "keywords": [
+    "Class Diagram",
+    "plantuml",
+    "typescript",
+    "uml"
+  ],
+  "homepage": "https://github.com/bafolts/tplant#readme",
+  "bugs": {
+    "url": "https://github.com/bafolts/tplant/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bafolts/tplant.git"
+  },
+  "license": "ISC",
+  "author": "Brian Folts",
+  "contributors": [
+    "Marcos V. Rubido <me@marcosvrs.com> (https://marcosvrs.com/)"
+  ],
+  "files": [
+    "dist/*.js"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "tplant": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:dev": "tsc --sourceMap -w",
+    "lint": "tslint -p .",
+    "lint:fix": "tslint -p . --fix",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "test": "npm run build && mocha"
   },
   "dependencies": {
     "commander": "^2.19.0",
@@ -14,31 +45,9 @@
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
-    "@types/node": "^10.12.15",
+    "@types/node": "^10.12.18",
     "mocha": "^5.2.0",
-    "tslint": "^5.11.0",
+    "tslint": "^5.12.1",
     "tslint-microsoft-contrib": "^6.0.0"
-  },
-  "scripts": {
-    "build": "tsc",
-    "build:dev": "tsc --sourceMap -w",
-    "test": "tsc && mocha"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bafolts/tplant.git"
-  },
-  "keywords": [
-    "plantuml",
-    "typescript",
-    "uml",
-    "Class Diagram"
-  ],
-  "author": "Brian Folts",
-  "contributors": ["Marcos V. Rubido <me@marcosvrs.com> (https://marcosvrs.com/)"],
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/bafolts/tplant/issues"
-  },
-  "homepage": "https://github.com/bafolts/tplant#readme"
+  }
 }

@@ -123,7 +123,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
     }
 
     function getMemberReturnType(symbol: ts.Symbol): string {
-        const returnType = getMemberType(symbol);
+        const returnType: MEMBER_TYPE = getMemberType(symbol);
         if (returnType === MEMBER_TYPE.PROPERTY || returnType === MEMBER_TYPE.INDEX) {
             return checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration));
         }
@@ -350,15 +350,16 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
         if ((<ts.ClassLikeDeclarationBase>symbol.valueDeclaration).members !== undefined) {
             (<ts.ClassLikeDeclarationBase>symbol.valueDeclaration).members.forEach((memberName: ts.ClassElement): void => {
-                const symbol: ts.Symbol | void = checker.getSymbolAtLocation((<ts.MethodDeclaration | ts.PropertyDeclaration>memberName).name);
-                if (symbol === undefined) {
+                const classSymbol: ts.Symbol | void = checker.getSymbolAtLocation(
+                    (<ts.MethodDeclaration | ts.PropertyDeclaration>memberName).name);
+                if (classSymbol === undefined) {
                     return;
                 }
-                const serializedMember: ISerializeMember | void = serializeMember(symbol);
+                const serializedMember: ISerializeMember | void = serializeMember(classSymbol);
                 if (serializedMember === undefined) {
                     return;
                 }
-                if (!details.members.some(e => e.name === serializedMember.name)) {
+                if (!details.members.some((e: ISerializeMember) => e.name === serializedMember.name)) {
                     details.members.push(serializedMember);
                 }
             });
