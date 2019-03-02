@@ -129,4 +129,33 @@ describe("Parser", () => {
 				'@enduml'].join(os.EOL));
 	});
 
+	it('generate PlantUML for Inheritance/autos.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Inheritance/autos.ts"])),
+			['@startuml',
+                'class Vehicle implements IVehicle {',
+                '    +color: string',
+                '    +start(type: string): string',
+				'}',
+                'interface IVehicle {',
+                '    +start(type: string): string',
+                '}',
+                'class Car extends Vehicle {',
+                '    +start(): string',
+                '}',
+                'interface ITrunk {',
+                '    +openTrunk(): void',
+                '}',
+                'interface IWindow {',
+                '    +openWindow(): void',
+                '}',
+                'class Sedan extends Car implements ITrunk, IWindow {',
+                '    +start(): string',
+                '    +openTrunk(): void',
+                '    +openWindow(): void',
+                '}',
+                'class Truck extends Vehicle {',
+                '    +start(): string',
+                '}',
+				'@enduml'].join(os.EOL));
+	});
 });

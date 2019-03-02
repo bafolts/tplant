@@ -277,8 +277,12 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         return (<ts.Identifier>heritageClause.types[0].expression).text;
     }
 
-    function getInterfaceName(heritageClause: ts.HeritageClause): string {
-        return (<ts.Identifier>heritageClause.types[0].expression).text;
+    function getInterfaceName(nodeObject: ts.ExpressionWithTypeArguments): string {
+        return (<ts.Identifier>nodeObject.expression).text;
+    }
+
+    function getInterfaceNames(heritageClause: ts.HeritageClause): string[] {
+        return heritageClause.types.map(getInterfaceName);
     }
 
     function serializeInterface(symbol: ts.Symbol): ISerializeInterface {
@@ -372,23 +376,15 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             return details;
         }
 
-        clauses.some((heritageClause: ts.HeritageClause): boolean => {
+        for (const heritageClause of clauses) {
             if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
                 details.extends = getExtendsClassName(heritageClause);
-
-                return true;
+            } else if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
+                details.implements = getInterfaceNames(heritageClause);
+            } else {
+                throw new Error('unsupported heritage clause');
             }
-            if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
-                if (details.implements === undefined) {
-                    details.implements = [];
-                }
-
-                details.implements.push(getInterfaceName(heritageClause));
-
-                return true;
-            }
-            throw new Error('unsupported heritage clause');
-        });
+        }
 
         return details;
     }
