@@ -40,6 +40,17 @@ describe("Parser", () => {
 				'@enduml'].join(os.EOL));
 	});
 
+	it('generate PlantUML for Enum/Enum.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Enum/Enum.ts"])),
+			['@startuml',
+				'enum Semaphore {',
+				'    RED',
+				'    GREEN',
+				'    YELLOW',
+				'}',
+				'@enduml'].join(os.EOL));
+	});
+
 	it("generate PlantUML for RayTracer", () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/RayTracer/index.ts"])),
 			['@startuml',
