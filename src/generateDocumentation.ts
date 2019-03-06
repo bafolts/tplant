@@ -314,11 +314,11 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             structure: STRUCTURE.ENUM
         };
 
-        if (symbol.members === undefined) {
+        if (symbol.exports === undefined) {
             return serializedEnum;
         }
 
-        symbol.members.forEach((memberName: ts.Symbol): void => {
+        symbol.exports.forEach((memberName: ts.Symbol): void => {
             serializedEnum.members.push(memberName.name);
         });
 
