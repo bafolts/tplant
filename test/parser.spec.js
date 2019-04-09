@@ -10,6 +10,7 @@ describe("Parser", () => {
 			['@startuml',
 				'class Greeter {',
 				'    +greeting: string',
+                '    +prefix: string',
 				'    +greet(): string',
 				'}',
 				'@enduml'].join(os.EOL));
@@ -169,4 +170,5 @@ describe("Parser", () => {
                 '}',
 				'@enduml'].join(os.EOL));
 	});
+
 });

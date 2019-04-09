@@ -175,6 +175,12 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             if (symbol.valueDeclaration.kind === ts.SyntaxKind.Constructor) {
                 return MEMBER_TYPE.CONSTRUCTOR;
             }
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.GetAccessor) {
+                return MEMBER_TYPE.PROPERTY;
+            }
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.SetAccessor) {
+                return MEMBER_TYPE.PROPERTY;
+            }
         } else if (symbol.declarations !== undefined && symbol.declarations.length > 0) {
             let kind: MEMBER_TYPE | undefined;
             symbol.declarations.some((declaration: ts.Declaration): boolean => {
