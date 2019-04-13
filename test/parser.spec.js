@@ -11,6 +11,7 @@ describe("Parser", () => {
 				'class Greeter {',
 				'    +greeting: string',
                 '    +prefix: string',
+                '    +greet(prefix: string): string',
 				'    +greet(): string',
 				'}',
 				'@enduml'].join(os.EOL));
@@ -100,6 +101,8 @@ describe("Parser", () => {
 				'    +intersect: (ray: Ray) => Intersection',
 				'    +normal: (pos: Vector) => Vector',
 				'    +surface: Surface',
+                '    +destroy(): void',
+                '    +destroy(name: string): void',
 				'}',
 				'interface Light {',
 				'    +pos: Vector',

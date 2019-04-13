@@ -97,6 +97,36 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         };
     }
 
+    function getTypeName(node: ts.TypeNode): string {
+        return checker.typeToString(checker.getTypeFromTypeNode(node));
+    }
+
+    function serializeMemberFunction(declaration: ts.Declaration): ISerializeMember | void {
+        let name: string = "unknown";
+        let keyword: KEYWORD_TYPE | undefined;
+        const anyDeclaration = declaration as any;
+        if (anyDeclaration.name && anyDeclaration.name.escapedText) {
+            name = anyDeclaration.name.escapedText;
+        } else {
+            console.warn("Unable to find member function name");
+        }
+        let modifierType: MODIFIER_TYPE = getModifierType(anyDeclaration.modifiers);
+        const parameters = anyDeclaration.parameters.map((parameter: any) => {
+            return {
+                name: parameter.name && parameter.name.escapedText,
+                type: getTypeName(parameter.type)
+            };
+        });
+        return {
+            keyword: keyword,
+            modifierType: modifierType,
+            name: name,
+            parameters: parameters,
+            returnType: getTypeName(anyDeclaration.symbol.valueDeclaration.type),
+            type: MEMBER_TYPE.METHOD
+        };
+    }
+
     function serializeMember(symbol: ts.Symbol): ISerializeMember | void {
         const result: ISerializeMember = {
             keyword: getMemberKeyword(symbol),
@@ -118,7 +148,6 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
                 )
             );
         }
-
         return result;
     }
 
@@ -220,8 +249,24 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         throw new Error('unable to determine member type');
     }
 
+    function getModifierType(modifiers: ts.NodeArray<ts.Modifier>): MODIFIER_TYPE {
+        if (modifiers !== undefined)
+        for (let modifier of modifiers) {
+            if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
+                return MODIFIER_TYPE.PRIVATE;
+            }
+            if (modifier.kind === ts.SyntaxKind.PublicKeyword) {
+                return MODIFIER_TYPE.PUBLIC;
+            }
+            if (modifier.kind === ts.SyntaxKind.ProtectedKeyword) {
+                return MODIFIER_TYPE.PROTECTED;
+            }
+        }
+        return MODIFIER_TYPE.PUBLIC;
+    }
+
     function getMemberModifierType(symbol: ts.Symbol): MODIFIER_TYPE {
-        let keyword: MODIFIER_TYPE = MODIFIER_TYPE.PUBLIC;
+        const keyword: MODIFIER_TYPE = MODIFIER_TYPE.PUBLIC;
 
         if (symbol.valueDeclaration === undefined ||
             symbol.valueDeclaration.modifiers === undefined ||
@@ -229,27 +274,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             return keyword;
         }
 
-        symbol.valueDeclaration.modifiers.some((modifier: ts.Modifier): boolean => {
-            if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
-                keyword = MODIFIER_TYPE.PRIVATE;
-
-                return true;
-            }
-            if (modifier.kind === ts.SyntaxKind.PublicKeyword) {
-                keyword = MODIFIER_TYPE.PUBLIC;
-
-                return true;
-            }
-            if (modifier.kind === ts.SyntaxKind.ProtectedKeyword) {
-                keyword = MODIFIER_TYPE.PROTECTED;
-
-                return true;
-            }
-
-            return false;
-        });
-
-        return keyword;
+        return getModifierType(symbol.valueDeclaration.modifiers);
     }
 
     function getMemberKeyword(symbol: ts.Symbol): KEYWORD_TYPE | undefined {
@@ -291,28 +316,6 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         return heritageClause.types.map(getInterfaceName);
     }
 
-    function serializeInterface(symbol: ts.Symbol): ISerializeInterface {
-        const serializedInterface: ISerializeInterface = {
-            ...serializeSymbol(symbol),
-            members: [],
-            structure: STRUCTURE.INTERFACE
-        };
-
-        if (symbol.members === undefined) {
-            return serializedInterface;
-        }
-
-        symbol.members.forEach((memberName: ts.Symbol): void => {
-            const serializedMember: ISerializeMember | void = serializeMember(memberName);
-            if (serializedMember === undefined) {
-                return;
-            }
-            serializedInterface.members.push(serializedMember);
-        });
-
-        return serializedInterface;
-    }
-
     function serializeEnum(symbol: ts.Symbol): ISerializeEnum {
         const serializedEnum: ISerializeEnum = {
             ...serializeSymbol(symbol),
@@ -329,6 +332,36 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         });
 
         return serializedEnum;
+    }
+
+    function serializeInterface(symbol: ts.Symbol): ISerializeInterface {
+        const serializedInterface: ISerializeInterface = {
+            ...serializeSymbol(symbol),
+            members: [],
+            structure: STRUCTURE.INTERFACE
+        };
+
+        if (symbol.members === undefined) {
+            return serializedInterface;
+        }
+
+        symbol.members.forEach((memberName: ts.Symbol): void => {
+            if (memberName.declarations && memberName.declarations.length > 1) {
+                for (let declaration of memberName.declarations) {
+                    const serializedMember: ISerializeMember | void = serializeMemberFunction(declaration);
+                    if (serializedMember !== undefined) {
+                        serializedInterface.members.push(serializedMember);
+                    }
+                }
+                return;
+            }
+            const serializedMember: ISerializeMember | void = serializeMember(memberName);
+            if (serializedMember === undefined) {
+                return;
+            }
+            serializedInterface.members.push(serializedMember);
+        });
+        return serializedInterface;
     }
 
     /**
@@ -350,6 +383,15 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
         if (symbol.members !== undefined) {
             symbol.members.forEach((memberName: ts.Symbol): void => {
+                if (memberName.declarations && memberName.declarations.length > 1) {
+                    for (let declaration of memberName.declarations) {
+                        const serializedMember: ISerializeMember | void = serializeMemberFunction(declaration);
+                        if (serializedMember !== undefined) {
+                            details.members.push(serializedMember);
+                        }
+                    }
+                    return;
+                }
                 const serializedMember: ISerializeMember | void = serializeMember(memberName);
                 if (serializedMember === undefined) {
                     return;

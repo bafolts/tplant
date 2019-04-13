@@ -7,6 +7,7 @@ export class Greeter {
     set prefix(prefix: string) {
         this.prefix = prefix;
     }
+    greet(prefix: string = "Foo"): string;
     greet(): string {
         return this.prefix + this.greeting;
     }
