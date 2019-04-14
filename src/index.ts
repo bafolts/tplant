@@ -6,7 +6,7 @@ import { convertToPlant } from './convertToPlant';
 import { generateDocumentation } from './generateDocumentation';
 
 commander
-    .version('2.0.4')
+    .version('2.0.5')
     .usage('[options]')
     .option('-i, --input [string]', 'input file')
     .parse(process.argv);
