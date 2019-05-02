@@ -231,7 +231,8 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
                     return true;
                 }
-                if (declaration.kind === ts.SyntaxKind.Constructor) {
+                if (declaration.kind === ts.SyntaxKind.Constructor ||
+                    declaration.kind === ts.SyntaxKind.ConstructSignature) {
                     kind = MEMBER_TYPE.CONSTRUCTOR;
 
                     return true;
@@ -241,17 +242,22 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
                     return true;
                 }
+                if (declaration.kind === ts.SyntaxKind.TypeParameter) {
+                    kind = MEMBER_TYPE.INDEX;
+
+                    return true;
+                }
 
                 return false;
             });
             if (kind === undefined) {
-                throw new Error('unable to determine member type');
+                throw new Error('unable to determine member type 2');
             }
 
             return kind;
         }
 
-        throw new Error('unable to determine member type');
+        throw new Error('unable to determine member type 3');
     }
 
     function getModifierType(modifiers: ts.NodeArray<ts.Modifier>): MODIFIER_TYPE {
