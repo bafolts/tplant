@@ -17,6 +17,7 @@ export interface ISerializeInterface extends ISerializeSymbol {
     structure: STRUCTURE;
     members: ISerializeMember[];
     extends?: string;
+    parameters?: ISerializeMember[];
 }
 
 export interface ISerializeEnum extends ISerializeSymbol {

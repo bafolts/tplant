@@ -121,12 +121,20 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             };
         });
 
+        const anyDeclarationSignature: ts.Signature | undefined = checker.getSignatureFromDeclaration(anyDeclaration);
+        let returnType: string = 'any';
+
+        if (anyDeclarationSignature !== undefined) {
+            returnType = checker.typeToString(anyDeclarationSignature
+                .getReturnType());
+        }
+
         return {
             keyword: keyword,
             modifierType: modifierType,
             name: name,
             parameters: parameters,
-            returnType: getTypeName((<any>anyDeclaration).symbol.valueDeclaration.type),
+            returnType: returnType,
             type: MEMBER_TYPE.METHOD
         };
     }
@@ -199,28 +207,31 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         if (symbol.valueDeclaration !== undefined) {
             if (symbol.valueDeclaration.kind === ts.SyntaxKind.PropertyDeclaration ||
                 symbol.valueDeclaration.kind === ts.SyntaxKind.PropertySignature ||
-                symbol.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
+                symbol.valueDeclaration.kind === ts.SyntaxKind.Parameter ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.GetAccessor ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.SetAccessor) {
                 return MEMBER_TYPE.PROPERTY;
             }
             if (symbol.valueDeclaration.kind === ts.SyntaxKind.MethodDeclaration ||
                 symbol.valueDeclaration.kind === ts.SyntaxKind.MethodSignature) {
                 return MEMBER_TYPE.METHOD;
             }
-            if (symbol.valueDeclaration.kind === ts.SyntaxKind.Constructor) {
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.Constructor ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.ConstructSignature) {
                 return MEMBER_TYPE.CONSTRUCTOR;
             }
-            if (symbol.valueDeclaration.kind === ts.SyntaxKind.GetAccessor) {
-                return MEMBER_TYPE.PROPERTY;
-            }
-            if (symbol.valueDeclaration.kind === ts.SyntaxKind.SetAccessor) {
-                return MEMBER_TYPE.PROPERTY;
+            if (symbol.valueDeclaration.kind === ts.SyntaxKind.IndexSignature ||
+                symbol.valueDeclaration.kind === ts.SyntaxKind.TypeParameter) {
+                return MEMBER_TYPE.INDEX;
             }
         } else if (symbol.declarations !== undefined && symbol.declarations.length > 0) {
             let kind: MEMBER_TYPE | undefined;
             symbol.declarations.some((declaration: ts.Declaration): boolean => {
                 if (declaration.kind === ts.SyntaxKind.PropertyDeclaration ||
                     declaration.kind === ts.SyntaxKind.PropertySignature ||
-                    declaration.kind === ts.SyntaxKind.Parameter) {
+                    declaration.kind === ts.SyntaxKind.Parameter ||
+                    declaration.kind === ts.SyntaxKind.GetAccessor ||
+                    declaration.kind === ts.SyntaxKind.SetAccessor) {
                     kind = MEMBER_TYPE.PROPERTY;
 
                     return true;
@@ -237,12 +248,8 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
                     return true;
                 }
-                if (declaration.kind === ts.SyntaxKind.IndexSignature) {
-                    kind = MEMBER_TYPE.INDEX;
-
-                    return true;
-                }
-                if (declaration.kind === ts.SyntaxKind.TypeParameter) {
+                if (declaration.kind === ts.SyntaxKind.IndexSignature ||
+                    declaration.kind === ts.SyntaxKind.TypeParameter) {
                     kind = MEMBER_TYPE.INDEX;
 
                     return true;
@@ -365,9 +372,20 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             if (memberName.declarations.length > 1) {
                 for (const declaration of memberName.declarations) {
                     const serializedMember: ISerializeMember | void = serializeMemberFunction(declaration);
-                    if (serializedMember !== undefined) {
-                        serializedInterface.members.push(serializedMember);
+                    if (serializedMember === undefined) {
+                        return;
                     }
+
+                    if (serializedMember.type === MEMBER_TYPE.INDEX) {
+                        if (serializedInterface.parameters === undefined) {
+                            serializedInterface.parameters = [];
+                        }
+                        serializedInterface.parameters.push(serializedMember);
+
+                        return;
+                    }
+
+                    serializedInterface.members.push(serializedMember);
                 }
 
                 return;
@@ -418,6 +436,15 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
 
                     return;
                 }
+
+                if (otherSerializedMember.type === MEMBER_TYPE.INDEX) {
+                    if (details.parameters === undefined) {
+                        details.parameters = [];
+                    }
+                    details.parameters.push(otherSerializedMember);
+
+                    return;
+                }
                 details.members.push(otherSerializedMember);
             });
         }
@@ -431,6 +458,14 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
                 }
                 const serializedMember: ISerializeMember | void = serializeMember(classSymbol);
                 if (serializedMember === undefined) {
+                    return;
+                }
+                if (serializedMember.type === MEMBER_TYPE.INDEX) {
+                    if (details.parameters === undefined) {
+                        details.parameters = [];
+                    }
+                    details.parameters.push(serializedMember);
+
                     return;
                 }
                 if (!details.members.some((e: ISerializeMember) => e.name === serializedMember.name)) {
