@@ -1,6 +1,6 @@
 {
   "name": "tplant",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "Typescript to PlantUML",
   "keywords": [
     "Class Diagram",
@@ -39,17 +39,17 @@
     "test": "npm run build && mocha"
   },
   "dependencies": {
-    "commander": "^2.19.0",
+    "commander": "^2.20.0",
     "glob": "^7.1.3",
-    "typescript": "^3.2.2"
+    "typescript": "^3.4.5"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
-    "@types/node": "^10.12.18",
-    "mocha": "^5.2.0",
+    "@types/node": "^12.0.0",
+    "mocha": "^6.1.4",
     "pre-commit": "^1.2.2",
-    "tslint": "^5.12.1",
-    "tslint-microsoft-contrib": "^6.0.0"
+    "tslint": "^5.16.0",
+    "tslint-microsoft-contrib": "^6.1.1"
   },
   "pre-commit": [
     "lint",

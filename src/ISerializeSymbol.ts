@@ -1,6 +1,7 @@
 export interface ISerializeSymbol {
     name: string;
     type: string;
+    questionToken?: boolean;
 }
 
 export interface ISerializeSignature {
@@ -11,23 +12,23 @@ export interface ISerializeSignature {
 export interface ISerializeMember extends ISerializeSymbol, ISerializeSignature {
     modifierType: string;
     keyword?: string;
+    constraint?: string;
 }
 
 export interface ISerializeInterface extends ISerializeSymbol {
     structure: STRUCTURE;
     members: ISerializeMember[];
     extends?: string;
+    implements?: string[];
     parameters?: ISerializeMember[];
 }
 
-export interface ISerializeEnum extends ISerializeSymbol {
-    structure: STRUCTURE;
-    members: string[];
-    extends?: string;
+export interface ISerializeEnum extends ISerializeInterface {
+    structure: STRUCTURE.ENUM;
 }
 
 export interface ISerializeClass extends ISerializeInterface {
-    implements?: string[];
+    structure: STRUCTURE.CLASS;
     constructors: ISerializeSignature[];
     keyword?: string;
 }
@@ -42,10 +43,11 @@ export enum MEMBER_TYPE {
     PROPERTY = 'property',
     METHOD = 'method',
     CONSTRUCTOR = 'constructor',
-    INDEX = 'index'
+    INDEX = 'index',
+    ENUM = 'enum'
 }
 
-export enum KEYWORD_TYPE {
+export enum CLASS_MEMBER_KEYWORD {
     ABSTRACT = 'abstract',
     STATIC = 'static'
 }
