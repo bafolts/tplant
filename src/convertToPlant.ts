@@ -1,4 +1,5 @@
 import * as os from 'os';
+import { ICommandOptions } from './ICommandOptions';
 import {
     ISerializeClass,
     ISerializeEnum,
@@ -6,7 +7,8 @@ import {
     ISerializeMember,
     ISerializeSymbol,
     MEMBER_TYPE,
-    MODIFIER_TYPE
+    MODIFIER_TYPE,
+    STRUCTURE
 } from './ISerializeSymbol';
 
 const TYPES: { [type: string]: string } = {
@@ -15,13 +17,29 @@ const TYPES: { [type: string]: string } = {
     [MODIFIER_TYPE.PUBLIC]: '+'
 };
 
-export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISerializeClass)[]): string {
+const COMPOSITION_LINE: string = '*--';
+
+type ISerializeSymbols = ISerializeInterface | ISerializeEnum | ISerializeClass;
+
+// tslint:disable-next-line max-func-body-length
+export function convertToPlant(tsjs: ISerializeSymbols[], options: ICommandOptions = {
+    compositions: false,
+    onlyInterfaces: false
+}): string {
 
     const lines: string[] = [];
+    const compositions: string[] = [];
+    let listOfSerializeSymbols: ISerializeSymbols[] = tsjs;
+
+    if (options.onlyInterfaces) {
+        listOfSerializeSymbols = listOfSerializeSymbols.filter(
+            (serializedSymbol: ISerializeSymbols): boolean => serializedSymbol.structure === STRUCTURE.INTERFACE
+        );
+    }
 
     lines.push('@startuml');
 
-    tsjs.forEach((serializedSymbol: ISerializeInterface | ISerializeEnum | ISerializeClass): void => {
+    listOfSerializeSymbols.forEach((serializedSymbol: ISerializeSymbols): void => {
 
         let keyword: string = '';
         if ((<ISerializeClass>serializedSymbol).keyword !== undefined) {
@@ -59,18 +77,27 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
 
         lines.push(`${keyword}${serializedSymbol.structure} ${serializedSymbol.name}${parameters}${heritage}${openingBrace}`);
 
-        serializedSymbol.members.forEach((serializedMember: ISerializeMember): number => lines.push(memberToString(serializedMember)));
+        serializedSymbol.members.forEach((serializedMember: ISerializeMember): void => {
+            checkCompositions(serializedMember, serializedSymbol.name);
+            lines.push(memberToString(serializedMember, serializedSymbol.name));
+        });
 
         if (serializedSymbol.members.length > 0) {
             lines.push('}');
         }
     });
 
+    if (compositions.length > 0 && options.compositions) {
+        const uniqueCompositions: string[] = compositions.filter(
+            (value: string, index: number, array: string[]): boolean => array.indexOf(value) === index);
+        uniqueCompositions.forEach((composition: string): number => lines.push(composition));
+    }
+
     lines.push('@enduml');
 
     return lines.join(os.EOL);
 
-    function memberToString(member: ISerializeMember): string {
+    function memberToString(member: ISerializeMember, parentName: string): string {
 
         let line: string = '    ';
 
@@ -97,6 +124,31 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
         }
 
         return line;
+    }
+
+    function checkCompositions(member: ISerializeMember, parentName: string): void {
+        listOfSerializeSymbols.some((serializedSymbolToSearch: ISerializeSymbol): boolean => {
+            if (parentName === serializedSymbolToSearch.name) {
+                return false;
+            }
+
+            const memberTypeIndex: number = member.type.split(' | ')
+                .indexOf(serializedSymbolToSearch.name);
+            const memberReturnTypeIndex: number = member.returnType.split(' | ')
+                .indexOf(serializedSymbolToSearch.name);
+
+            const memberParameterTypes: string[] = [];
+            member.parameters.forEach((parameter: ISerializeSymbol): number => memberParameterTypes.push(...parameter.type.split(' | ')));
+            const memberParamterTypesIndex: number = memberParameterTypes.indexOf(serializedSymbolToSearch.name);
+
+            if (memberTypeIndex < 0 && memberReturnTypeIndex < 0 && memberParamterTypesIndex < 0) {
+                return false;
+            }
+
+            compositions.push(`${parentName} ${COMPOSITION_LINE} ${serializedSymbolToSearch.name}`);
+
+            return true;
+        });
     }
 
 }

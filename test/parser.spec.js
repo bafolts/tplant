@@ -3,7 +3,7 @@ const os = require('os');
 const generateDocumentation = require("../dist/generateDocumentation");
 const convertToPlant = require("../dist/convertToPlant");
 
-describe("Parse Typescript Playground codes", () => {
+describe("Parse Sample codes", () => {
 
 	it('generate PlantUML for Abstract/AbstractClass.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Abstract/AbstractClass.ts"])),
@@ -213,6 +213,10 @@ describe("Parse Typescript Playground codes", () => {
 	it('generate PlantUML for src/index.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["src/index.ts"])),
 			['@startuml',
+				'interface ICommandOptions {',
+				'    +compositions: boolean',
+				'    +onlyInterfaces: boolean',
+				'}',
 				'interface ISerializeSymbol {',
 				'    +name: string',
 				'    +type: string',
