@@ -111,7 +111,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
         }
 
         return {
-            name: `${symbol.getName()}`,
+            name: symbol.getName(),
             type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration)),
             questionToken
         };
@@ -150,22 +150,13 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
     }
 
     function getMemberReturnType(memberSymbol: ts.Symbol, memberDeclaration: ts.Declaration): string {
-        const returnType: MEMBER_TYPE = getMemberType(memberDeclaration);
-        if (returnType === MEMBER_TYPE.PROPERTY || returnType === MEMBER_TYPE.INDEX) {
-            return checker.typeToString(checker.getTypeOfSymbolAtLocation(memberSymbol, memberDeclaration));
-        }
-        if (returnType === MEMBER_TYPE.METHOD) {
-            const methodSignature: ts.Signature | undefined = checker.getSignatureFromDeclaration(<ts.MethodSignature>memberDeclaration);
-
-            if (methodSignature === undefined) {
-                return '';
-            }
-
-            return checker.typeToString(methodSignature.getReturnType());
+        const memberType: MEMBER_TYPE = getMemberType(memberDeclaration);
+        if (memberType === MEMBER_TYPE.ENUM || memberType === MEMBER_TYPE.CONSTRUCTOR) {
+            // Skip constructors and Enums
+            return '';
         }
 
-        // Skip constructors and Enums
-        return '';
+        return checker.typeToString(checker.getTypeOfSymbolAtLocation(memberSymbol, memberDeclaration));
     }
 
     function getQuestionToken(memberDeclaration: ts.Declaration): boolean {
@@ -200,9 +191,11 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
             case ts.SyntaxKind.ConstructSignature:
                 return MEMBER_TYPE.CONSTRUCTOR;
             case ts.SyntaxKind.IndexSignature:
-            case ts.SyntaxKind.TypeParameter:
                 return MEMBER_TYPE.INDEX;
+            case ts.SyntaxKind.TypeParameter:
+                return MEMBER_TYPE.PARAMETER;
             case ts.SyntaxKind.EnumMember:
+            case ts.SyntaxKind.EnumDeclaration:
                 return MEMBER_TYPE.ENUM;
             default:
                 throw new Error('unable to determine member type');
@@ -357,7 +350,7 @@ export function generateDocumentation(fileNames: ReadonlyArray<string>, options:
                     return;
                 }
 
-                if (serializedMember.type === MEMBER_TYPE.INDEX) {
+                if (serializedMember.type === MEMBER_TYPE.PARAMETER) {
                     if (serializedInterface.parameters === undefined) {
                         serializedInterface.parameters = [];
                     }

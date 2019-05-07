@@ -25,7 +25,7 @@ describe("Parse Typescript Playground codes", () => {
 				'}',
 				'@enduml'].join(os.EOL));
 	});
-
+	
 	it('generate PlantUML for Enum/Enum.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Enum/Enum.ts"])),
 			['@startuml',
@@ -253,6 +253,7 @@ describe("Parse Typescript Playground codes", () => {
 				'    CONSTRUCTOR',
 				'    INDEX',
 				'    ENUM',
+				'    PARAMETER',
 				'}',
 				'enum CLASS_MEMBER_KEYWORD {',
 				'    ABSTRACT',

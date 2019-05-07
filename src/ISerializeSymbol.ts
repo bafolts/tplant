@@ -44,7 +44,8 @@ export enum MEMBER_TYPE {
     METHOD = 'method',
     CONSTRUCTOR = 'constructor',
     INDEX = 'index',
-    ENUM = 'enum'
+    ENUM = 'enum',
+    PARAMETER = 'parameter'
 }
 
 export enum CLASS_MEMBER_KEYWORD {
