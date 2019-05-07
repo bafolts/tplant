@@ -13,10 +13,10 @@ import {
 } from './ISerializeSymbol';
 
 // tslint:disable-next-line max-func-body-length
-export function generateDocumentation(fileNames: ReadonlyArray<string>, options: ts.CompilerOptions = {
-    module: ts.ModuleKind.CommonJS,
-    target: ts.ScriptTarget.ES2015
-}): (ISerializeInterface | ISerializeEnum | ISerializeClass)[] {
+export function generateDocumentation(
+    fileNames: ReadonlyArray<string>,
+    options: ts.CompilerOptions = ts.getDefaultCompilerOptions()
+): (ISerializeInterface | ISerializeEnum | ISerializeClass)[] {
 
     // Build a program using the set of root file names in fileNames
     const program: ts.Program = ts.createProgram(fileNames, options);
