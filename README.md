@@ -37,7 +37,7 @@ class Wheel {
 class Car {
     +wheel: Wheel
 }
-Car o-- Wheel
+Car *-- Wheel
 @enduml
 ```
 ### -I, --only-interfaces
