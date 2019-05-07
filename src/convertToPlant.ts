@@ -42,9 +42,14 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
         let parameters: string = '';
         if (serializedClass.parameters !== undefined && serializedClass.parameters.length > 0) {
             parameters = `<${serializedClass.parameters.map(
-                (parameter: ISerializeMember): string => parameter.name
-            )
-            .join(', ')}>`;
+                (parameter: ISerializeMember): string => {
+                    if (parameter.constraint === undefined) {
+                        return parameter.name;
+                    }
+
+                    return `${parameter.name} extends ${parameter.constraint}`;
+                })
+                .join(', ')}>`;
         }
 
         let openingBrace: string = '';
@@ -54,9 +59,7 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
 
         lines.push(`${keyword}${serializedSymbol.structure} ${serializedSymbol.name}${parameters}${heritage}${openingBrace}`);
 
-        for (const serializedMember of serializedSymbol.members) {
-            lines.push(memberToString(serializedMember));
-        }
+        serializedSymbol.members.forEach((serializedMember: ISerializeMember): number => lines.push(memberToString(serializedMember)));
 
         if (serializedSymbol.members.length > 0) {
             lines.push('}');
@@ -67,14 +70,12 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
 
     return lines.join(os.EOL);
 
-    function memberToString(member: string | ISerializeMember): string {
+    function memberToString(member: ISerializeMember): string {
 
-        let line: string = `    `;
+        let line: string = '    ';
 
-        if (typeof member === 'string') {
-            line += member;
-
-            return line;
+        if (member.type === MEMBER_TYPE.ENUM) {
+            return `${line}${member.name}`;
         }
 
         line += TYPES[member.modifierType];
@@ -83,15 +84,12 @@ export function convertToPlant(tsjs: (ISerializeInterface | ISerializeEnum | ISe
             line += `{${member.keyword}} `;
         }
 
-        line += member.name;
+        line += `${member.name}${member.questionToken !== undefined && member.questionToken ? '?' : ''}`;
 
         if (member.type === MEMBER_TYPE.METHOD) {
-            line += '(';
-            line += member.parameters.map((parameter: ISerializeSymbol): string => {
-                return `${parameter.name}: ${parameter.type}`;
-            })
-                .join(', ');
-            line += ')';
+            line += `(${member.parameters.map((parameter: ISerializeSymbol): string =>
+                `${parameter.name}${parameter.questionToken !== undefined && parameter.questionToken ? '?' : ''}: ${parameter.type}`)
+                .join(', ')})`;
         }
 
         if (member.returnType !== undefined) {

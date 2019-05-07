@@ -5,14 +5,34 @@ const convertToPlant = require("../dist/convertToPlant");
 
 describe("Parse Typescript Playground codes", () => {
 
+	it('generate PlantUML for Abstract/AbstractClass.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Abstract/AbstractClass.ts"])),
+			['@startuml',
+				'abstract class AbstractClass {',
+				'    +{abstract} ToTest(): any',
+				'}',
+				'@enduml'].join(os.EOL));
+	});
+
 	it('generate PlantUML for Classes/Greeter.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Classes/Greeter.ts"])),
 			['@startuml',
 				'class Greeter {',
 				'    +greeting: string',
 				'    +prefix: string',
-				'    +greet(prefix: string): string',
+				'    +greet(prefix?: string): string',
 				'    +greet(): string',
+				'}',
+				'@enduml'].join(os.EOL));
+	});
+	
+	it('generate PlantUML for Enum/Enum.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Enum/Enum.ts"])),
+			['@startuml',
+				'enum Semaphore {',
+				'    RED',
+				'    GREEN',
+				'    YELLOW',
 				'}',
 				'@enduml'].join(os.EOL));
 	});
@@ -33,22 +53,68 @@ describe("Parse Typescript Playground codes", () => {
 				'@enduml'].join(os.EOL));
 	});
 
-	it('generate PlantUML for Abstract/AbstractClass.ts', () => {
-		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Abstract/AbstractClass.ts"])),
+	it('generate PlantUML for Generics/Complex.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/Complex.ts"])),
 			['@startuml',
-				'abstract class AbstractClass {',
-				'    +{abstract} ToTest(): any',
+				'interface GenericInterface<T extends string> {',
+				'    +method(arg: T): T',
+				'}',
+				'interface GenericInterface2<T extends string> {',
+				'    +property?: T',
+				'}',
+				'interface GenericInterface3<T extends string, A extends number> extends GenericInterface2 {',
+				'    +method2(arg: A): A',
+				'}',
+				'class GenericClass<T extends string, A extends number> implements GenericInterface, GenericInterface3 {',
+				'    +property?: T',
+				'    +method(arg: T): T',
+				'    +method2(arg: A): A',
+				'}',
+				'class GenericClass2<T extends string> implements GenericInterface2 {',
+				'    +property?: T',
+				'}',
+				'class ConcreteClass extends GenericClass implements GenericInterface, GenericInterface2 {',
+				'    +property: string',
 				'}',
 				'@enduml'].join(os.EOL));
 	});
 
-	it('generate PlantUML for Enum/Enum.ts', () => {
-		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Enum/Enum.ts"])),
+	it('generate PlantUML for Generics/Greeter.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/Greeter.ts"])),
 			['@startuml',
-				'enum Semaphore {',
-				'    RED',
-				'    GREEN',
-				'    YELLOW',
+				'class Greeter<T> {',
+				'    +greeting: T',
+				'    +greet(): T',
+				'}',
+				'@enduml'].join(os.EOL));
+	});
+
+	it('generate PlantUML for Inheritance/autos.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Inheritance/autos.ts"])),
+			['@startuml',
+				'class Vehicle implements IVehicle {',
+				'    +color: string',
+				'    +start(type: string): string',
+				'}',
+				'interface IVehicle {',
+				'    +start(type: string): string',
+				'}',
+				'class Car extends Vehicle {',
+				'    +start(): string',
+				'}',
+				'interface ITrunk {',
+				'    +openTrunk(): void',
+				'}',
+				'interface IWindow {',
+				'    +openWindow(): void',
+				'}',
+				'class Sedan extends Car implements ITrunk, IWindow {',
+				'    +start(): string',
+				'    +openTrunk(): void',
+				'    +openWindow(): void',
+				'}',
+				'class Truck extends Vehicle {',
+				'    +start(): string',
 				'}',
 				'@enduml'].join(os.EOL));
 	});
@@ -144,76 +210,37 @@ describe("Parse Typescript Playground codes", () => {
 				'@enduml'].join(os.EOL));
 	});
 
-	it('generate PlantUML for Inheritance/autos.ts', () => {
-		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Inheritance/autos.ts"])),
-			['@startuml',
-				'class Vehicle implements IVehicle {',
-				'    +color: string',
-				'    +start(type: string): string',
-				'}',
-				'interface IVehicle {',
-				'    +start(type: string): string',
-				'}',
-				'class Car extends Vehicle {',
-				'    +start(): string',
-				'}',
-				'interface ITrunk {',
-				'    +openTrunk(): void',
-				'}',
-				'interface IWindow {',
-				'    +openWindow(): void',
-				'}',
-				'class Sedan extends Car implements ITrunk, IWindow {',
-				'    +start(): string',
-				'    +openTrunk(): void',
-				'    +openWindow(): void',
-				'}',
-				'class Truck extends Vehicle {',
-				'    +start(): string',
-				'}',
-				'@enduml'].join(os.EOL));
-	});
-
-	it('generate PlantUML for Generics/Greeter.ts', () => {
-		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/Greeter.ts"])),
-			['@startuml',
-				'class Greeter<T> {',
-				'    +greeting: T',
-				'    +greet(): T',
-				'}',
-				'@enduml'].join(os.EOL));
-	});
-
 	it('generate PlantUML for src/index.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["src/index.ts"])),
 			['@startuml',
 				'interface ISerializeSymbol {',
 				'    +name: string',
 				'    +type: string',
+				'    +questionToken?: boolean',
 				'}',
 				'interface ISerializeSignature {',
 				'    +parameters: ISerializeSymbol[]',
 				'    +returnType: string',
 				'}',
-				'interface ISerializeMember {',
+				'interface ISerializeMember extends ISerializeSymbol {',
 				'    +modifierType: string',
-				'    +keyword: string',
+				'    +keyword?: string',
+				'    +constraint?: string',
 				'}',
-				'interface ISerializeInterface {',
+				'interface ISerializeInterface extends ISerializeSymbol {',
 				'    +structure: STRUCTURE',
 				'    +members: ISerializeMember[]',
-				'    +extends: string',
-				'    +parameters: ISerializeMember[]',
+				'    +extends?: string',
+				'    +implements?: string[]',
+				'    +parameters?: ISerializeMember[]',
 				'}',
-				'interface ISerializeEnum {',
-				'    +structure: STRUCTURE',
-				'    +members: string[]',
-				'    +extends: string',
+				'interface ISerializeEnum extends ISerializeInterface {',
+				'    +structure: STRUCTURE.ENUM',
 				'}',
-				'interface ISerializeClass {',
-				'    +implements: string[]',
+				'interface ISerializeClass extends ISerializeInterface {',
+				'    +structure: STRUCTURE.CLASS',
 				'    +constructors: ISerializeSignature[]',
-				'    +keyword: string',
+				'    +keyword?: string',
 				'}',
 				'enum MODIFIER_TYPE {',
 				'    PUBLIC',
@@ -225,8 +252,10 @@ describe("Parse Typescript Playground codes", () => {
 				'    METHOD',
 				'    CONSTRUCTOR',
 				'    INDEX',
+				'    ENUM',
+				'    PARAMETER',
 				'}',
-				'enum KEYWORD_TYPE {',
+				'enum CLASS_MEMBER_KEYWORD {',
 				'    ABSTRACT',
 				'    STATIC',
 				'}',
