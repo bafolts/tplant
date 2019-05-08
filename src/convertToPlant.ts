@@ -127,21 +127,23 @@ export function convertToPlant(tsjs: ISerializeSymbols[], options: ICommandOptio
     }
 
     function checkCompositions(member: ISerializeMember, parentName: string): void {
+        const regexGenericParameter: RegExp = /\<.*\>$/;
+        const splitUnionTypes: string = ' | ';
+
         listOfSerializeSymbols.some((serializedSymbolToSearch: ISerializeSymbol): boolean => {
             if (parentName === serializedSymbolToSearch.name) {
                 return false;
             }
 
-            const memberTypeIndex: number = member.type.split(' | ')
-                .indexOf(serializedSymbolToSearch.name);
-            const memberReturnTypeIndex: number = member.returnType.split(' | ')
-                .indexOf(serializedSymbolToSearch.name);
+            const memberTypes: string[] = member.returnType.split(splitUnionTypes)
+                .map((memberType: string): string => memberType.replace(regexGenericParameter, ''));
 
-            const memberParameterTypes: string[] = [];
-            member.parameters.forEach((parameter: ISerializeSymbol): number => memberParameterTypes.push(...parameter.type.split(' | ')));
-            const memberParamterTypesIndex: number = memberParameterTypes.indexOf(serializedSymbolToSearch.name);
+            member.parameters.forEach((parameter: ISerializeSymbol): number =>
+                memberTypes.push(...parameter.type.split(splitUnionTypes)
+                    .map((parameterType: string): string => parameterType.replace(regexGenericParameter, ''))
+                ));
 
-            if (memberTypeIndex < 0 && memberReturnTypeIndex < 0 && memberParamterTypesIndex < 0) {
+            if (memberTypes.indexOf(serializedSymbolToSearch.name) < 0) {
                 return false;
             }
 

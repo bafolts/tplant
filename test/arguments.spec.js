@@ -126,6 +126,44 @@ describe("Test commander options", () => {
                 '@enduml'].join(os.EOL));
     });
 
+    it('generate PlantUML for Generics/Complex.ts with compositions', () => {
+        assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/Complex.ts"]), { compositions: true, onlyInterfaces: false }),
+            ['@startuml',
+                'interface GenericInterface<T extends string> {',
+                '    +method(arg: T): T',
+                '}',
+                'interface GenericInterface2<T extends string> {',
+                '    +property?: T',
+                '}',
+                'interface GenericInterface3<T extends string, A extends number> extends GenericInterface2 {',
+                '    +method2(arg: A): A',
+                '}',
+                'class GenericClass<T extends string, A extends number> implements GenericInterface, GenericInterface3 {',
+                '    +property?: T',
+                '    +method(arg: T): T',
+                '    +method2(arg: A): A',
+                '}',
+                'class GenericClass2<T extends string> implements GenericInterface2 {',
+                '    +property?: T',
+                '}',
+                'class ConcreteClass extends GenericClass implements GenericInterface, GenericInterface2 {',
+                '    +property: string',
+                '}',
+                'interface GenericTypes {',
+                '    +genericType: GenericClass<string, number>',
+                '    +genericType2: GenericClass2<string>',
+                '    +genericReturnType(): GenericInterface<string>',
+                '    +genericReturnType2(): GenericInterface3<string, number>',
+                '    +genericParameter(parameter: GenericInterface2<string>): void',
+                '}',
+                'GenericTypes *-- GenericClass',
+                'GenericTypes *-- GenericClass2',
+                'GenericTypes *-- GenericInterface',
+                'GenericTypes *-- GenericInterface3',
+                'GenericTypes *-- GenericInterface2',
+                '@enduml'].join(os.EOL));
+    });
+
     it("generate PlantUML for RayTracer with compositions and only Interfaces", () => {
         assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/RayTracer/index.ts"]), { compositions: true, onlyInterfaces: true }),
             ['@startuml',
