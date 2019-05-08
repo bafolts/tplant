@@ -111,18 +111,31 @@ describe("Test commander options", () => {
                 'Ray *-- Vector',
                 'Intersection *-- Thing',
                 'Intersection *-- Ray',
+                'Surface *-- Vector',
+                'Surface *-- Color',
+                'Thing *-- Ray',
+                'Thing *-- Intersection',
+                'Thing *-- Vector',
                 'Thing *-- Surface',
                 'Light *-- Vector',
                 'Light *-- Color',
                 'Camera *-- Vector',
+                'Scene *-- Thing',
+                'Scene *-- Light',
                 'Scene *-- Camera',
+                'Plane *-- Vector',
+                'Plane *-- Ray',
+                'Plane *-- Intersection',
                 'Plane *-- Surface',
                 'Sphere *-- Vector',
                 'Sphere *-- Surface',
                 'Sphere *-- Ray',
                 'RayTracer *-- Ray',
                 'RayTracer *-- Intersection',
+                'RayTracer *-- Scene',
+                'RayTracer *-- Color',
                 'RayTracer *-- Vector',
+                'RayTracer *-- Thing',
                 '@enduml'].join(os.EOL));
     });
 
@@ -164,6 +177,35 @@ describe("Test commander options", () => {
                 '@enduml'].join(os.EOL));
     });
 
+    it('generate PlantUML for Generics/RecursiveGenericType.ts with compositions', () => {
+        assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/RecursiveGenericType.ts"]), { compositions: true, onlyInterfaces: false }),
+            ['@startuml',
+                'interface FirstGeneric<T> {',
+                '    +index: T',
+                '}',
+                'interface SecondGeneric<T> {',
+                '    +index: T',
+                '}',
+                'interface ThirdGeneric<T> {',
+                '    +index: T',
+                '}',
+                'interface NormalInterface {',
+                '    +index: any',
+                '}',
+                'interface NormalInterface_2 {',
+                '    +index: any',
+                '}',
+                'interface RecursiveGenericType {',
+                '    +recursiveGenericType: string | number | FirstGeneric<SecondGeneric<ThirdGeneric<NormalInterface> | NormalInterface_2>>',
+                '}',
+                'RecursiveGenericType *-- FirstGeneric',
+                'RecursiveGenericType *-- SecondGeneric',
+                'RecursiveGenericType *-- ThirdGeneric',
+                'RecursiveGenericType *-- NormalInterface',
+                'RecursiveGenericType *-- NormalInterface_2',
+                '@enduml'].join(os.EOL));
+    });
+
     it("generate PlantUML for RayTracer with compositions and only Interfaces", () => {
         assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/RayTracer/index.ts"]), { compositions: true, onlyInterfaces: true }),
             ['@startuml',
@@ -200,7 +242,11 @@ describe("Test commander options", () => {
                 '}',
                 'Intersection *-- Thing',
                 'Intersection *-- Ray',
+                'Thing *-- Ray',
+                'Thing *-- Intersection',
                 'Thing *-- Surface',
+                'Scene *-- Thing',
+                'Scene *-- Light',
                 '@enduml'].join(os.EOL));
     });
 });

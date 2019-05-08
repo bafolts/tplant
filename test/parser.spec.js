@@ -96,6 +96,30 @@ describe("Parse Sample codes", () => {
 				'@enduml'].join(os.EOL));
 	});
 
+	it('generate PlantUML for Generics/RecursiveGenericType.ts', () => {
+		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Generics/RecursiveGenericType.ts"])),
+			['@startuml',
+				'interface FirstGeneric<T> {',
+				'    +index: T',
+				'}',
+				'interface SecondGeneric<T> {',
+				'    +index: T',
+				'}',
+				'interface ThirdGeneric<T> {',
+				'    +index: T',
+				'}',
+				'interface NormalInterface {',
+				'    +index: any',
+				'}',
+				'interface NormalInterface_2 {',
+				'    +index: any',
+				'}',
+				'interface RecursiveGenericType {',
+				'    +recursiveGenericType: string | number | FirstGeneric<SecondGeneric<ThirdGeneric<NormalInterface> | NormalInterface_2>>',
+				'}',
+				'@enduml'].join(os.EOL));
+	});
+
 	it('generate PlantUML for Inheritance/autos.ts', () => {
 		assert.equal(convertToPlant.convertToPlant(generateDocumentation.generateDocumentation(["sample/Inheritance/autos.ts"])),
 			['@startuml',
