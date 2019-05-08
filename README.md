@@ -18,7 +18,11 @@ tplant --input sample/Classes/Greeter.ts --output sample/Classes/Greeter.puml
 ### -o, --output <path>
     Define the path of the output file. If not defined, it'll output on the STDOUT
 
-### -c, --compositions
+### -p, --project <path>
+    Compile a project given a valid configuration file.
+    The argument can be a file path to a valid JSON configuration file, or a directory path to a directory containing a tsconfig.json file.
+
+### -C, --compositions
     Create not heritage compositions.
     Example:
 ```typescript
