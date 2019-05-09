@@ -1,0 +1,32 @@
+language: node_js
+
+node_js:
+  - "node"
+  - "lts/*"
+
+env:
+  global:
+    - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
+
+before_install:
+  - echo "REPO_VERSION=$REPO_VERSION"
+
+before_script:
+  - npm run lint
+
+before_deploy:
+  - |
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
+      git tag -a -f "$REPO_VERSION"
+      echo "New Tag $(git describe --tags)";
+    fi
+
+deploy:
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    on:
+      branch: master
+  - provider: npm
+    api_key: $NPM_API_KEY
+    on:
+      tags: true
