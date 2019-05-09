@@ -4,14 +4,9 @@ node_js:
   - "node"
   - "lts/*"
 
-env:
-  global:
-    - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
-
-before_install:
-  - echo "REPO_VERSION=$REPO_VERSION"
-
 before_script:
+  - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
+  - echo "REPO_VERSION=$REPO_VERSION"
   - npm run lint
 
 before_deploy:
@@ -27,6 +22,7 @@ deploy:
     on:
       branch: master
   - provider: npm
+    email: "tplant@tplant.com"
     api_key: $NPM_API_KEY
     on:
       tags: true
