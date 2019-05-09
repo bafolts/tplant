@@ -6,7 +6,6 @@ node_js:
 
 env:
   global:
-    - secure: lEDam2X+/RJfqstC/MhByuqvH0vaT8FRLRY3Uq0stmCeTLJssSicu9MTj3BffoR3TFaadsgEDZs0KpAdj6WSqI64c+DxnhGreOe19iSPaQt54rizJAxz//Pav2nW3weP5zbXWB+Pbm9cCJdB7NNvmaH+KRmfYAJj/pwzSOIQO3SvgCulU36Dpw6oC6PkCa6gWPHkH9FTivxaoltx2DYav4dM3JLAKa1JhssbcOp6Hk/pnlNLsDNKY2bWlzfzPXHeue78V/d/63hhjcS0g0f18X/RXwUVuaL/TcJSmpTTvk8jy0sgvl9dP7mdV4eA2DdOPVp9IeSj0I0eELATHC9lUg7Msupq7kveZtqX4vOqlmiP88JvUQhkJT+/kQCIwYCk+v3PzKMnj6iJck567ckGRSauyEHVSyPVW4F6XSw1h9V/Awme1fdJAiyANWhpyVqUIvdZANKSRJwPwobb28HShl6yyFAT+D2mb8ayM5LBMPG4xlYI14+Ww4JKPa9OFU12W65gN7gO8VIUiQyMND2P62yglIJWk5w5cEIA3hHXT+rBOHpuS88vozE4j54lLYQGHSqMEZsCmbFWNxhLfdhEvKNyG7UiS1udD1hWkwvZ0U6fLZ2XFWbxhENFdZ9em6pI/Jq2KhkAxAgjYAuQUk2zgI7hpEQ/MBKO296hTJjCg9Q=
     - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
 
 before_install:
@@ -28,7 +27,6 @@ deploy:
     on:
       branch: master
   - provider: npm
-    email: "npmjs@marcosvrs.com"
     api_key: $NPM_API_KEY
     on:
       tags: true
