@@ -27,3 +27,11 @@ class GenericClass2<T extends string> implements GenericInterface2<T> {
 class ConcreteClass extends GenericClass<string, number> implements GenericInterface<string>, GenericInterface2<string> {
     property: string;
 }
+
+interface GenericTypes {
+    genericType: GenericClass<string, number>;
+    genericType2: GenericClass2<string>;
+    genericReturnType(): GenericInterface<string>;
+    genericReturnType2(): GenericInterface3<string, number>;
+    genericParameter(parameter: GenericInterface2<string>): void;
+}

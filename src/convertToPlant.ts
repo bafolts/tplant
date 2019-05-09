@@ -18,6 +18,7 @@ const TYPES: { [type: string]: string } = {
 };
 
 const COMPOSITION_LINE: string = '*--';
+const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
 
 type ISerializeSymbols = ISerializeInterface | ISerializeEnum | ISerializeClass;
 
@@ -127,27 +128,30 @@ export function convertToPlant(tsjs: ISerializeSymbols[], options: ICommandOptio
     }
 
     function checkCompositions(member: ISerializeMember, parentName: string): void {
-        listOfSerializeSymbols.some((serializedSymbolToSearch: ISerializeSymbol): boolean => {
+        listOfSerializeSymbols.forEach((serializedSymbolToSearch: ISerializeSymbol): void => {
             if (parentName === serializedSymbolToSearch.name) {
-                return false;
+                return;
             }
 
-            const memberTypeIndex: number = member.type.split(' | ')
-                .indexOf(serializedSymbolToSearch.name);
-            const memberReturnTypeIndex: number = member.returnType.split(' | ')
-                .indexOf(serializedSymbolToSearch.name);
+            const memberTypes: string[] = [];
+            const onlyReturnTypeNames: string[] | null = member.returnType.match(REGEX_ONLY_TYPE_NAMES);
 
-            const memberParameterTypes: string[] = [];
-            member.parameters.forEach((parameter: ISerializeSymbol): number => memberParameterTypes.push(...parameter.type.split(' | ')));
-            const memberParamterTypesIndex: number = memberParameterTypes.indexOf(serializedSymbolToSearch.name);
+            if (onlyReturnTypeNames !== null) {
+                memberTypes.push(...onlyReturnTypeNames);
+            }
 
-            if (memberTypeIndex < 0 && memberReturnTypeIndex < 0 && memberParamterTypesIndex < 0) {
-                return false;
+            member.parameters.forEach((parameter: ISerializeSymbol): void => {
+                const onlyTypeNames: string[] | null = parameter.type.match(REGEX_ONLY_TYPE_NAMES);
+                if (onlyTypeNames !== null) {
+                    memberTypes.push(...onlyTypeNames);
+                }
+            });
+
+            if (memberTypes.indexOf(serializedSymbolToSearch.name) < 0) {
+                return;
             }
 
             compositions.push(`${parentName} ${COMPOSITION_LINE} ${serializedSymbolToSearch.name}`);
-
-            return true;
         });
     }
 
