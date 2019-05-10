@@ -7,14 +7,20 @@ node_js:
   before_script:
     - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
     - echo "REPO_VERSION=$REPO_VERSION"
+    - npm run build
     - TPLANT_VERSION="$(node dist/index.js -V)"
     - echo "TPLANT_VERSION=$TPLANT_VERSION"
-    - NPM_PACKAGE_VERSION="$(npx tplant -v)"
+    - NPM_PACKAGE_VERSION="$(npx tplant -V)"
     - echo "NPM_PACKAGE_VERSION=$NPM_PACKAGE_VERSION"
     - echo "TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
     - |
-      if [ "$REPO_VERSION" != "$TPLANT_VERSION" ] || {[ "$TRAVIS_PULL_REQUEST_BRANCH" == "master" ] && [ "$REPO_VERSION" == "$NPM_PACKAGE_VERSION" ]}; then
+      if [ "$REPO_VERSION" != "$TPLANT_VERSION" ]; then
         echo '\033[0;31mPackage version and commander version must be the same.'
+        travis_terminate 1;
+      fi
+    - |
+      if [ "$TRAVIS_PULL_REQUEST_BRANCH" == "master" ] && [ "$REPO_VERSION" == "$NPM_PACKAGE_VERSION" ]; then
+        echo '\033[0;31mPackage version must be higher than the current one.'
         travis_terminate 1;
       fi
     - npm run lint
