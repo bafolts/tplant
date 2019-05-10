@@ -4,41 +4,52 @@ node_js:
   - "node"
   - "lts/*"
   
-  before_script:
-    - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
-    - echo "REPO_VERSION=$REPO_VERSION"
-    - npm run build
-    - TPLANT_VERSION="$(node dist/index.js -V)"
-    - echo "TPLANT_VERSION=$TPLANT_VERSION"
-    - NPM_PACKAGE_VERSION="$(npx tplant -V)"
-    - echo "NPM_PACKAGE_VERSION=$NPM_PACKAGE_VERSION"
-    - echo "TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
-    - |
-      if [ "$REPO_VERSION" != "$TPLANT_VERSION" ]; then
-        echo '\033[0;31mPackage version and commander version must be the same.'
-        travis_terminate 1;
-      fi
-    - |
-      if [ "$TRAVIS_PULL_REQUEST_BRANCH" == "master" ] && [ "$REPO_VERSION" == "$NPM_PACKAGE_VERSION" ]; then
-        echo '\033[0;31mPackage version must be higher than the current one.'
-        travis_terminate 1;
-      fi
-    - npm run lint
-    
-    before_deploy:
-      - |
-        if [ "$TRAVIS_BRANCH" == "master" ]; then
-          git tag -a -f "$REPO_VERSION"
-          echo "New Tag $(git describe --tags)";
-        fi
-      
+before_script:
+  - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
+  - echo "REPO_VERSION=$REPO_VERSION"
+  - npm run build
+  - TPLANT_VERSION="$(node dist/index.js -V)"
+  - echo "TPLANT_VERSION=$TPLANT_VERSION"
+  - NPM_PACKAGE_VERSION="$(npx tplant -V)"
+  - echo "NPM_PACKAGE_VERSION=$NPM_PACKAGE_VERSION"
+  - echo "TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST"
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
+  - |
+    if [ "$REPO_VERSION" != "$TPLANT_VERSION" ]; then
+      echo '\033[0;31mPackage version and commander version must be the same.'
+      travis_terminate 1;
+    fi
+  - |
+    if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$REPO_VERSION" == "$NPM_PACKAGE_VERSION" ]; then
+      echo '\033[0;31mPackage version must be higher than the current one.'
+      travis_terminate 1;
+    fi
+  - npm run lint
+
+jobs:
+  include:
+    - stage: "Github Deployment"
+      node_js: "lts/*"
+      install: skip
+      script: skip
+      before_deploy:
+        - REPO_VERSION="$(npx -c 'echo "$npm_package_version"')"
+        - echo "REPO_VERSION=$REPO_VERSION"
+        - git tag -a -f "$REPO_VERSION"
+        - echo "New Tag $(git describe --tags)";
+        
       deploy:
-        - provider: releases
+        provider: releases
         api_key: $GITHUB_TOKEN
         on:
           branch: master
-          - provider: npm
-          email: "brian.folts@gmail.com"
-          api_key: $NPM_API_KEY
-          on:
-            tags: true
+
+    - stage: "npm Deployment"
+      node_js: "lts/*"
+      script: skip
+      deploy:
+        provider: npm
+        email: "brian.folts@gmail.com"
+        api_key: $NPM_API_KEY
+        on:
+          tags: true
