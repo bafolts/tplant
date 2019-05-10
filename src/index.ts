@@ -10,7 +10,7 @@ import { convertToPlant } from './convertToPlant';
 import { generateDocumentation } from './generateDocumentation';
 
 commander
-    .version('2.1.4')
+    .version('2.1.5')
     .usage('[options]')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')

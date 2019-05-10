@@ -131,11 +131,11 @@ describe("Test commander options", () => {
                 'Sphere *-- Surface',
                 'Sphere *-- Ray',
                 'RayTracer *-- Ray',
-                'RayTracer *-- Intersection',
                 'RayTracer *-- Scene',
+                'RayTracer *-- Intersection',
                 'RayTracer *-- Color',
-                'RayTracer *-- Vector',
                 'RayTracer *-- Thing',
+                'RayTracer *-- Vector',
                 '@enduml'].join(os.EOL));
     });
 

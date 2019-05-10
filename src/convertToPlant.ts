@@ -1,158 +1,200 @@
 import * as os from 'os';
-import { ICommandOptions } from './ICommandOptions';
-import {
-    ISerializeClass,
-    ISerializeEnum,
-    ISerializeInterface,
-    ISerializeMember,
-    ISerializeSymbol,
-    MEMBER_TYPE,
-    MODIFIER_TYPE,
-    STRUCTURE
-} from './ISerializeSymbol';
+import { Class } from './components/Class';
+import { Enum } from './components/Enum';
+import { EnumValue } from './components/EnumValue';
+import { File } from './components/File';
+import { Interface } from './components/Interface';
+import { Method } from './components/Method';
+import { Namespace } from './components/Namespace';
+import { Parameter } from './components/Parameter';
+import { Property } from './components/Property';
+import { TypeParameter } from './components/TypeParameter';
 
-const TYPES: { [type: string]: string } = {
-    [MODIFIER_TYPE.PRIVATE]: '-',
-    [MODIFIER_TYPE.PROTECTED]: '#',
-    [MODIFIER_TYPE.PUBLIC]: '+'
-};
+import { ICommandOptions } from './ICommandOptions';
 
 const COMPOSITION_LINE: string = '*--';
 const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
 
-type ISerializeSymbols = ISerializeInterface | ISerializeEnum | ISerializeClass;
-
-// tslint:disable-next-line max-func-body-length
-export function convertToPlant(tsjs: ISerializeSymbols[], options: ICommandOptions = {
+export function convertToPlant(files: File[], options: ICommandOptions = {
     compositions: false,
     onlyInterfaces: false
 }): string {
 
     const lines: string[] = [];
     const compositions: string[] = [];
-    let listOfSerializeSymbols: ISerializeSymbols[] = tsjs;
 
     if (options.onlyInterfaces) {
-        listOfSerializeSymbols = listOfSerializeSymbols.filter(
-            (serializedSymbol: ISerializeSymbols): boolean => serializedSymbol.structure === STRUCTURE.INTERFACE
-        );
+        for (const file of files) {
+            file.parts = file.parts.filter((part: Class | Enum | Interface | Namespace): boolean => part instanceof Interface);
+        }
     }
 
     lines.push('@startuml');
 
-    listOfSerializeSymbols.forEach((serializedSymbol: ISerializeSymbols): void => {
-
-        let keyword: string = '';
-        if ((<ISerializeClass>serializedSymbol).keyword !== undefined) {
-            keyword = `${(<ISerializeClass>serializedSymbol).keyword} `;
-        }
-
-        let heritage: string = '';
-
-        if (serializedSymbol.extends !== undefined) {
-            heritage += ` extends ${serializedSymbol.extends}`;
-        }
-
-        const serializedClass: ISerializeClass = <ISerializeClass>serializedSymbol;
-        if (serializedClass.implements !== undefined) {
-            heritage += ` implements ${serializedClass.implements.join(', ')}`;
-        }
-
-        let parameters: string = '';
-        if (serializedClass.parameters !== undefined && serializedClass.parameters.length > 0) {
-            parameters = `<${serializedClass.parameters.map(
-                (parameter: ISerializeMember): string => {
-                    if (parameter.constraint === undefined) {
-                        return parameter.name;
-                    }
-
-                    return `${parameter.name} extends ${parameter.constraint}`;
-                })
-                .join(', ')}>`;
-        }
-
-        let openingBrace: string = '';
-        if (serializedSymbol.members.length > 0) {
-            openingBrace = ' {';
-        }
-
-        lines.push(`${keyword}${serializedSymbol.structure} ${serializedSymbol.name}${parameters}${heritage}${openingBrace}`);
-
-        serializedSymbol.members.forEach((serializedMember: ISerializeMember): void => {
-            checkCompositions(serializedMember, serializedSymbol.name);
-            lines.push(memberToString(serializedMember, serializedSymbol.name));
-        });
-
-        if (serializedSymbol.members.length > 0) {
-            lines.push('}');
+    files.forEach((file: File): void => {
+        const conversion: string = convertFile(file);
+        if (conversion !== '') {
+            lines.push(conversion);
         }
     });
 
-    if (compositions.length > 0 && options.compositions) {
-        const uniqueCompositions: string[] = compositions.filter(
-            (value: string, index: number, array: string[]): boolean => array.indexOf(value) === index);
-        uniqueCompositions.forEach((composition: string): number => lines.push(composition));
+    if (options.compositions) {
+        const mappedTypes: {[x: string]: boolean} = {};
+        const outputConstraints: {[x: string]: boolean} = {};
+        files.forEach((file: File): void => {
+            file.parts.forEach((part: Class | Namespace | Enum | Interface): void => {
+                if (part instanceof Class || part instanceof Interface || part instanceof Enum) {
+                    mappedTypes[part.name] = true;
+                }
+            });
+        });
+        files.forEach((file: File): void => {
+            file.parts.forEach((part: Class | Namespace | Enum | Interface): void => {
+                if (part instanceof Class || part instanceof Interface) {
+                    part.members.forEach((member: Method | Property): void => {
+                        let checks: string[] = [];
+                        if (member instanceof Method) {
+                            member.parameters.forEach((p: Parameter): void => {
+                                const parameters: string[] | null = p.type.match(REGEX_ONLY_TYPE_NAMES);
+                                if (parameters !== null) {
+                                    checks = checks.concat(parameters);
+                                }
+                            });
+                        }
+                        const returnTypes: string[] | null = member.returnType.match(REGEX_ONLY_TYPE_NAMES);
+                        if (returnTypes !== null) {
+                            checks = checks.concat(returnTypes);
+                        }
+                        for (const allTypeName of checks) {
+                            const key: string = `${part.name} ${COMPOSITION_LINE} ${allTypeName}`;
+                            if (allTypeName !== part.name &&
+                                !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(allTypeName)) {
+                                lines.push(key);
+                                outputConstraints[key] = true;
+                            }
+                        }
+                    });
+                }
+            });
+        });
     }
 
     lines.push('@enduml');
 
     return lines.join(os.EOL);
+}
 
-    function memberToString(member: ISerializeMember, parentName: string): string {
-
-        let line: string = '    ';
-
-        if (member.type === MEMBER_TYPE.ENUM) {
-            return `${line}${member.name}`;
-        }
-
-        line += TYPES[member.modifierType];
-
-        if (member.keyword !== undefined) {
-            line += `{${member.keyword}} `;
-        }
-
-        line += `${member.name}${member.questionToken !== undefined && member.questionToken ? '?' : ''}`;
-
-        if (member.type === MEMBER_TYPE.METHOD) {
-            line += `(${member.parameters.map((parameter: ISerializeSymbol): string =>
-                `${parameter.name}${parameter.questionToken !== undefined && parameter.questionToken ? '?' : ''}: ${parameter.type}`)
-                .join(', ')})`;
-        }
-
-        if (member.returnType !== undefined) {
-            line += `: ${member.returnType}`;
-        }
-
-        return line;
+function modifierToSymbol(modifier: 'public' | 'protected' | 'private'): string {
+    if (modifier === 'public') {
+        return '+';
+    }
+    if (modifier === 'private') {
+        return '-';
     }
 
-    function checkCompositions(member: ISerializeMember, parentName: string): void {
-        listOfSerializeSymbols.forEach((serializedSymbolToSearch: ISerializeSymbol): void => {
-            if (parentName === serializedSymbolToSearch.name) {
-                return;
-            }
+    return '#';
+}
 
-            const memberTypes: string[] = [];
-            const onlyReturnTypeNames: string[] | null = member.returnType.match(REGEX_ONLY_TYPE_NAMES);
+function convertParameter(parameter: Parameter): string {
+    return `${parameter.name}${parameter.isOptional || parameter.hasInitializer ? '?' : ''}: ${parameter.type}`;
+}
 
-            if (onlyReturnTypeNames !== null) {
-                memberTypes.push(...onlyReturnTypeNames);
-            }
+function convertMethod(method: Method): string {
+    let result: string = modifierToSymbol(method.modifier);
+    result += (method.isAbstract ? '{abstract} ' : '');
+    result += (method.isStatic ? '{static} ' : '');
+    result += `${method.name}(`;
+    result += method.parameters
+                .map(convertParameter)
+                .join(', ');
+    result += `): ${method.returnType}`;
 
-            member.parameters.forEach((parameter: ISerializeSymbol): void => {
-                const onlyTypeNames: string[] | null = parameter.type.match(REGEX_ONLY_TYPE_NAMES);
-                if (onlyTypeNames !== null) {
-                    memberTypes.push(...onlyTypeNames);
-                }
-            });
+    return result;
+}
 
-            if (memberTypes.indexOf(serializedSymbolToSearch.name) < 0) {
-                return;
-            }
+function convertProperty(property: Property): string {
 
-            compositions.push(`${parentName} ${COMPOSITION_LINE} ${serializedSymbolToSearch.name}`);
-        });
+    return `${modifierToSymbol(property.modifier)}${(property.isStatic ? '{static} ' : '')
+                }${property.name}${(property.isOptional ? '?' : '')}: ${property.returnType}`;
+}
+
+function convertTypeParameter(typeParameter: TypeParameter): string {
+
+    return `${typeParameter.name}${(typeParameter.constraint !== undefined ? ` extends ${typeParameter.constraint}` : '')}`;
+}
+
+function convertEnum(enu: Enum): string {
+    const result: string[] = [];
+    result.push(`enum ${enu.name} {`);
+    enu.values.forEach((enumValue: EnumValue): void => {
+        result.push(`    ${enumValue.name}`);
+    });
+    result.push('}');
+
+    return result.join(os.EOL);
+}
+
+function convertClass(cls: Class): string {
+    const result: string[] = [];
+    result.push(`${(cls.isAbstract ? 'abstract ' : '')}class ${cls.name}${convertTypeParameters(cls.typeParameters)
+        }${(cls.extendsClass !== '' ? ` extends ${cls.extendsClass}` : '')
+        }${(cls.implementsInterfaces.length > 0 ? ` implements ${cls.implementsInterfaces.join(', ')}` : '')} {`);
+    cls.members.forEach((member: Method | Property): void => {
+        if (member instanceof Method) {
+            result.push(`    ${convertMethod(member)}`);
+        } else if (member instanceof Property) {
+            result.push(`    ${convertProperty(member)}`);
+        }
+    });
+    result.push('}');
+
+    return result.join(os.EOL);
+}
+
+function convertTypeParameters(typeParameters: TypeParameter[]): string {
+    if (typeParameters.length > 0) {
+        return `<${typeParameters
+                    .map(convertTypeParameter)
+                    .join(', ')}>`;
     }
 
+    return '';
+}
+
+function convertExtends(exts: string[]): string {
+    if (exts.length > 0) {
+        return ` extends ${exts.join(', ')}`;
+    }
+
+    return '';
+}
+
+function convertInterface(inter: Interface): string {
+    const result: string[] = [];
+    result.push(`interface ${inter.name}${convertTypeParameters(inter.typeParameters)}${convertExtends(inter.extends)} {`);
+    inter.members.forEach((member: Method | Property): void => {
+        if (member instanceof Method) {
+            result.push(`    ${convertMethod(member)}`);
+        } else if (member instanceof Property) {
+            result.push(`    ${convertProperty(member)}`);
+        }
+    });
+    result.push('}');
+
+    return result.join(os.EOL);
+}
+
+function convertFile(file: File): string {
+    const result: string[] = [];
+    file.parts.forEach((part: Interface | Class | Enum | Namespace): void => {
+        if (part instanceof Interface) {
+            result.push(convertInterface(part));
+        } else if (part instanceof Class) {
+            result.push(convertClass(part));
+        } else if (part instanceof Enum) {
+            result.push(convertEnum(part));
+        }
+    });
+
+    return result.join(os.EOL);
 }

@@ -1,6 +1,6 @@
 {
   "name": "tplant",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Typescript to PlantUML",
   "keywords": [
     "Class Diagram",
@@ -36,7 +36,7 @@
     "lint:fix": "tslint -p . --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "test": "npm run build && mocha"
+    "test": "npm run build && mocha --timeout 0"
   },
   "dependencies": {
     "commander": "^2.20.0",
