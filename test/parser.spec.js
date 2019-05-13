@@ -228,6 +228,8 @@ describe("Parse Sample codes", () => {
 				'    +normal(pos: Vector): Vector',
 				'    +intersect(ray: Ray): { thing: this; ray: Ray; dist: number; }',
 				'}',
+                'namespace Surfaces {',
+                '}',
 				'class RayTracer {',
 				'    -maxDepth: number',
 				'    -intersections(ray: Ray, scene: Scene): Intersection',

@@ -6,6 +6,7 @@
     ],
     "jsRules": {},
     "rules": {
+        "export-name": false,
         "no-console": false,
         "no-relative-imports": [
             true,
