@@ -1,6 +1,7 @@
 
 import { ComponentKind } from './ComponentKind';
 import { IComponentComposite } from './IComponentComposite';
+import { Modifier } from './Modifier';
 
 /**
  * Represents the metadata for a property within typescript
@@ -8,7 +9,7 @@ import { IComponentComposite } from './IComponentComposite';
 export class Property implements IComponentComposite {
     public componentKind: ComponentKind = ComponentKind.PROPERTY;
     public name: string = '';
-    public modifier: 'public' | 'protected' | 'private' = 'public';
+    public modifier: Modifier = 'public';
     public returnType: string = '';
     public isOptional: boolean = false;
     public isStatic: boolean = false;

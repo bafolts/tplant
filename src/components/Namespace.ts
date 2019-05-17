@@ -14,7 +14,7 @@ import { Property } from './Property';
 export class Namespace implements IComponentComposite {
     public name: string = '';
     public componentKind: ComponentKind = ComponentKind.NAMESPACE;
-    public parts: (Enum | Class | Interface | Namespace | Property | Method)[] = [];
+    public parts: IComponentComposite[] = [];
     public toPUML(): string {
         const result: string[] = [];
         result.push(`namespace ${this.name} {`);

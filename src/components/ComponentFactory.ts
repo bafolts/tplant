@@ -2,6 +2,7 @@
 import ts from 'typescript';
 import { Method } from './Method';
 import * as MethodFactory from './MethodFactory';
+import { Modifier } from './Modifier';
 import { Property } from './Property';
 import * as PropertyFactory from './PropertyFactory';
 import { TypeParameter } from './TypeParameter';
@@ -19,7 +20,7 @@ export function isNodeExported(node: ts.Node): boolean {
         node.parent.kind === ts.SyntaxKind.ModuleBlock;
 }
 
-export function getModifierType(modifiers: ts.NodeArray<ts.Modifier>): 'public' | 'protected' | 'private' {
+export function getModifier(modifiers: ts.NodeArray<ts.Modifier>): Modifier {
     for (const modifier of modifiers) {
         if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
             return 'private';
@@ -64,14 +65,14 @@ export function isTypeParameter(declaration: ts.NamedDeclaration): boolean {
     return declaration.kind === ts.SyntaxKind.TypeParameter;
 }
 
-export function getMemberModifierType(memberDeclaration: ts.Declaration): 'public' | 'private' | 'protected' {
+export function getMemberModifier(memberDeclaration: ts.Declaration): 'public' | 'private' | 'protected' {
     const memberModifiers: ts.NodeArray<ts.Modifier> | undefined = memberDeclaration.modifiers;
 
     if (memberModifiers === undefined) {
         return 'public';
     }
 
-    return getModifierType(memberModifiers);
+    return getModifier(memberModifiers);
 }
 
 export function isAbstract(memberDeclaration: ts.Declaration): boolean {

@@ -1,9 +1,10 @@
 
 import ts from 'typescript';
 import * as ComponentFactory from './ComponentFactory';
+import { IComponentComposite } from './IComponentComposite';
 import { Interface } from './Interface';
 
-export function create(interfaceSymbol: ts.Symbol, checker: ts.TypeChecker): Interface {
+export function create(interfaceSymbol: ts.Symbol, checker: ts.TypeChecker): IComponentComposite {
     const result: Interface = new Interface();
     result.name = interfaceSymbol.getName();
 

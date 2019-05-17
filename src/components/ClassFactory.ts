@@ -2,8 +2,9 @@
 import ts from 'typescript';
 import { Class } from './Class';
 import * as ComponentFactory from './ComponentFactory';
+import { IComponentComposite } from './IComponentComposite';
 
-export function create(classSymbol: ts.Symbol, checker: ts.TypeChecker): Class {
+export function create(classSymbol: ts.Symbol, checker: ts.TypeChecker): IComponentComposite {
     const result: Class = new Class();
     const classDeclaration: ts.ClassDeclaration[] | undefined = <ts.ClassDeclaration[] | undefined>classSymbol.getDeclarations();
 

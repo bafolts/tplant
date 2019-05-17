@@ -13,7 +13,7 @@ import { Namespace } from './Namespace';
 export class File implements IComponentComposite {
     public componentKind: ComponentKind = ComponentKind.FILE;
     public name: string = '';
-    public parts: (Namespace | Class | Interface | Enum)[] = [];
+    public parts: IComponentComposite[] = [];
     public toPUML(): string {
         const result: string[] = [];
         this.parts.forEach((part: IComponentComposite): void => {

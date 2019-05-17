@@ -1,6 +1,7 @@
 
 import { ComponentKind } from './ComponentKind';
 import { IComponentComposite } from './IComponentComposite';
+import { Modifier } from './Modifier';
 import { Parameter } from './Parameter';
 
 /**
@@ -11,7 +12,7 @@ export class Method implements IComponentComposite {
     public name: string = '';
     public parameters: Parameter[] = [];
     public returnType: string = '';
-    public modifier: 'public' | 'protected' | 'private' = 'public';
+    public modifier: Modifier = 'public';
     public isAbstract: boolean = false;
     public isOptional: boolean = false;
     public isStatic: boolean = false;

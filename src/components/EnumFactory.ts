@@ -4,6 +4,7 @@ import * as ComponentFactory from './ComponentFactory';
 import { Enum } from './Enum';
 import { EnumValue } from './EnumValue';
 import * as EnumValueFactory from './EnumValueFactory';
+import { IComponentComposite } from './IComponentComposite';
 
 function serializeEnumProperties(memberSymbols: ts.UnderscoreEscapedMap<ts.Symbol>, checker: ts.TypeChecker): EnumValue[] {
     const result: EnumValue[] = [];
@@ -25,7 +26,7 @@ function serializeEnumProperties(memberSymbols: ts.UnderscoreEscapedMap<ts.Symbo
     return result;
 }
 
-export function create(enumSymbol: ts.Symbol, checker: ts.TypeChecker): Enum {
+export function create(enumSymbol: ts.Symbol, checker: ts.TypeChecker): IComponentComposite {
     const result: Enum = new Enum();
     result.name = enumSymbol.getName();
 

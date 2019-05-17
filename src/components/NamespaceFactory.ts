@@ -3,11 +3,12 @@ import ts from 'typescript';
 import * as ClassFactory from './ClassFactory';
 import * as ComponentFactory from './ComponentFactory';
 import * as EnumFactory from './EnumFactory';
+import { IComponentComposite } from './IComponentComposite';
 import * as InterfaceFactory from './InterfaceFactory';
 import { Namespace } from './Namespace';
 import * as NamespaceFactory from './NamespaceFactory';
 
-export function create(namespaceSymbol: ts.Symbol, checker: ts.TypeChecker): Namespace {
+export function create(namespaceSymbol: ts.Symbol, checker: ts.TypeChecker): IComponentComposite {
     const result: Namespace = new Namespace();
     const namespaceDeclarations: ts.NamespaceDeclaration[] | undefined =
         <ts.NamespaceDeclaration[] | undefined>namespaceSymbol.getDeclarations();
