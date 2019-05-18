@@ -98,6 +98,8 @@ describe("Test commander options", () => {
                 '    +normal(pos: Vector): Vector',
                 '    +intersect(ray: Ray): { thing: this; ray: Ray; dist: number; }',
                 '}',
+                'namespace Surfaces {',
+                '}',
                 'class RayTracer {',
                 '    -maxDepth: number',
                 '    -intersections(ray: Ray, scene: Scene): Intersection',
@@ -131,11 +133,11 @@ describe("Test commander options", () => {
                 'Sphere *-- Surface',
                 'Sphere *-- Ray',
                 'RayTracer *-- Ray',
-                'RayTracer *-- Intersection',
                 'RayTracer *-- Scene',
+                'RayTracer *-- Intersection',
                 'RayTracer *-- Color',
-                'RayTracer *-- Vector',
                 'RayTracer *-- Thing',
+                'RayTracer *-- Vector',
                 '@enduml'].join(os.EOL));
     });
 
