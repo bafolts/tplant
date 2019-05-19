@@ -1,6 +1,6 @@
 {
   "name": "tplant",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "Typescript to PlantUML",
   "keywords": [
     "Class Diagram",
@@ -20,6 +20,9 @@
   "author": "Brian Folts",
   "contributors": [
     "Marcos V. Rubido <me@marcosvrs.com> (https://marcosvrs.com/)"
+  ],
+  "files": [
+    "dist"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
