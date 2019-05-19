@@ -24,8 +24,8 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/tplant.js",
+  "types": "dist/tplant.d.ts",
   "bin": {
     "tplant": "dist/index.js"
   },
@@ -36,7 +36,7 @@
     "lint:fix": "tslint -p . --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "test": "npm run build && mocha --timeout 0"
+    "test": "jest"
   },
   "dependencies": {
     "commander": "^2.20.0",
@@ -45,14 +45,20 @@
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
+    "@types/jest": "^24.0.13",
     "@types/node": "^12.0.0",
-    "mocha": "^6.1.4",
+    "jest": "^24.8.0",
     "pre-commit": "^1.2.2",
+    "ts-jest": "^24.0.2",
     "tslint": "^5.16.0",
     "tslint-microsoft-contrib": "^6.1.1"
   },
   "pre-commit": [
     "lint",
     "test"
-  ]
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
 }
