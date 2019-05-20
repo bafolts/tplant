@@ -3,8 +3,8 @@ import { tplant } from '../src/tplant';
 
 describe('Test commander options', () => {
     
-    it('generate PlantUML with only Interfaces for Inheritance/autos.ts', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['sample/Inheritance/autos.ts']), { compositions: false, onlyInterfaces: true }))
+    it('generate PlantUML with only Interfaces for Playground/Inheritance/autos.ts', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Inheritance/autos.ts']), { compositions: false, onlyInterfaces: true }))
         .toEqual(
             ['@startuml',
             'interface IVehicle {',
@@ -20,7 +20,7 @@ describe('Test commander options', () => {
         });
         
         it('generate PlantUML for RayTracer with compositions', () => {
-            expect(tplant.convertToPlant(tplant.generateDocumentation(['sample/RayTracer/index.ts']), { compositions: true, onlyInterfaces: false }))
+            expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { compositions: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
                 'class Vector {',
@@ -141,7 +141,7 @@ describe('Test commander options', () => {
             });
             
             it('generate PlantUML for Generics/Complex.ts with compositions', () => {
-                expect(tplant.convertToPlant(tplant.generateDocumentation(['sample/Generics/Complex.ts']), { compositions: true, onlyInterfaces: false }))
+                expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/Complex.ts']), { compositions: true, onlyInterfaces: false }))
                 .toEqual(
                     ['@startuml',
                     'interface GenericInterface<T extends string> {',
@@ -180,7 +180,7 @@ describe('Test commander options', () => {
                 });
                 
                 it('generate PlantUML for Generics/RecursiveGenericType.ts with compositions', () => {
-                    expect(tplant.convertToPlant(tplant.generateDocumentation(['sample/Generics/RecursiveGenericType.ts']), { compositions: true, onlyInterfaces: false }))
+                    expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/RecursiveGenericType.ts']), { compositions: true, onlyInterfaces: false }))
                     .toEqual(
                         ['@startuml',
                         'interface FirstGeneric<T> {',
@@ -210,7 +210,7 @@ describe('Test commander options', () => {
                     });
                     
                     it('generate PlantUML for RayTracer with compositions and only Interfaces', () => {
-                        expect(tplant.convertToPlant(tplant.generateDocumentation(['sample/RayTracer/index.ts']), { compositions: true, onlyInterfaces: true }))
+                        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { compositions: true, onlyInterfaces: true }))
                         .toEqual(
                             ['@startuml',
                             'interface Ray {',
