@@ -23,8 +23,10 @@ export class Namespace implements IComponentComposite {
         }
         result.push(declaration.join(''));
         this.parts.forEach((part: IComponentComposite): void => {
-            result.push(part.toPUML()
-            .replace(/^/gm, '    '));
+            result.push(
+                part.toPUML()
+                    .replace(/^(?!\s*$)/gm, '    ')
+            );
         });
         if (this.parts.length > 0) {
             result.push('}');
