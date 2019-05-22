@@ -7,7 +7,7 @@ Will convert a Typescript file to a PlantUML file. Following all inheritances.
 
 ```
 npm install --global tplant
-tplant --input sample/Classes/Greeter.ts --output sample/Classes/Greeter.puml
+tplant --input test/Playground/Classes/Greeter.ts --output test/Playground/Classes/Greeter.puml
 ```
 
 ## Options

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+// tslint:disable:no-console
 
 import commander from 'commander';
 import fs from 'fs';
@@ -6,12 +6,10 @@ import G from 'glob';
 import os from 'os';
 import path from 'path';
 import ts from 'typescript';
-import { convertToPlant } from './convertToPlant';
-import { generateDocumentation } from './generateDocumentation';
+import { tplant } from './tplant';
 
 commander
-    .version('2.1.8')
-    .usage('[options]')
+    .version('2.2.0')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
@@ -38,8 +36,8 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
 
     const tsConfigFile: string | undefined = findTsConfigFile(<string>commander.input, <string | undefined>commander.tsconfig);
 
-    const output: string = convertToPlant(
-        generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
+    const output: string = tplant.convertToPlant(
+        tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
         {
             compositions: <boolean>commander.compositions,
             onlyInterfaces: <boolean>commander.onlyInterfaces
@@ -91,6 +89,8 @@ function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | un
     if (fs.existsSync(cwdTsConfigFile)) {
         return cwdTsConfigFile;
     }
+
+    return;
 }
 
 function getCompilerOptions(tsConfigFilePath?: string): ts.CompilerOptions {

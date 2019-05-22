@@ -1,7 +1,6 @@
 #Compiled files
 dist
 *.js
-!*.spec.js
 
 #IDE
 .vscode
