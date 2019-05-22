@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // tslint:disable:no-console
 
 import commander from 'commander';
