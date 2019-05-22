@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // tslint:disable:no-console
 
 import commander from 'commander';
@@ -9,7 +11,7 @@ import ts from 'typescript';
 import { tplant } from './tplant';
 
 commander
-    .version('2.2.0')
+    .version('2.2.1')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
