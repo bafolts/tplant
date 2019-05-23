@@ -63,7 +63,8 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
         return;
     }
 
-    writeFile(<string>commander.output, plantUMLDocument);
+    // tslint:disable-next-line non-literal-fs-path
+    fs.writeFileSync(<string>commander.output, plantUMLDocument, 'binary');
 });
 
 function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | undefined {
@@ -132,35 +133,17 @@ function getCompilerOptions(tsConfigFilePath?: string): ts.CompilerOptions {
     return convertedCompilerOptions.options;
 }
 
-function writeFile(output: string, input: string): void {
-    // tslint:disable-next-line non-literal-fs-path
-    fs.writeFile(output, input, 'binary', (errNoException: NodeJS.ErrnoException | null): void => {
-        if (errNoException !== null) {
-            throw errNoException;
-        }
-
-        console.log('The file was saved!');
-    });
-}
-
 function requestImageFile(output: string, input: string, extension: string): void {
     http.get({
         host: 'www.plantuml.com',
         path: `/plantuml/${extension}/${encode(input)}`
     },       (res: http.IncomingMessage): void => {
-        let imagedata: string = '';
+        // tslint:disable-next-line non-literal-fs-path
+        const fileStream: fs.WriteStream = fs.createWriteStream(output);
         res.setEncoding('binary');
-
-        res.on('data', (chunk: string): void => {
-            imagedata += chunk;
-        });
-
+        res.pipe(fileStream);
         res.on('error', (err: Error): void => {
             throw err;
-        });
-
-        res.on('end', (): void => {
-            writeFile(output, imagedata);
         });
     });
 }
