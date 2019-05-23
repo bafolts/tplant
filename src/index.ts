@@ -5,13 +5,17 @@
 import commander from 'commander';
 import fs from 'fs';
 import G from 'glob';
+import http from 'http';
 import os from 'os';
 import path from 'path';
+import { encode } from 'plantuml-encoder';
 import ts from 'typescript';
 import { tplant } from './tplant';
 
+const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
+
 commander
-    .version('2.2.1')
+    .version('2.3.0')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
@@ -31,14 +35,12 @@ if (!commander.input) {
 
 G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
     if (err !== null) {
-        console.error(err);
-
-        return;
+        throw err;
     }
 
     const tsConfigFile: string | undefined = findTsConfigFile(<string>commander.input, <string | undefined>commander.tsconfig);
 
-    const output: string = tplant.convertToPlant(
+    const plantUMLDocument: string = tplant.convertToPlant(
         tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
         {
             compositions: <boolean>commander.compositions,
@@ -47,21 +49,21 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
     );
 
     if (commander.output === undefined) {
-        console.log(output);
+        console.log(plantUMLDocument);
 
         return;
     }
 
-    // tslint:disable-next-line non-literal-fs-path
-    fs.writeFile(<string>commander.output, output, (errNoException: NodeJS.ErrnoException | null): void => {
-        if (errNoException !== null) {
-            console.error(errNoException);
+    const extension: string = path.extname(<string>commander.output)
+        .replace(/^\./gm, '');
 
-            return;
-        }
+    if (AVAILABLE_PLANTUML_EXTENSIONS.includes(extension)) {
+        requestImageFile(<string>commander.output, plantUMLDocument, extension);
 
-        console.log('The file was saved!');
-    });
+        return;
+    }
+
+    writeFile(<string>commander.output, plantUMLDocument);
 });
 
 function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | undefined {
@@ -128,4 +130,37 @@ function getCompilerOptions(tsConfigFilePath?: string): ts.CompilerOptions {
     }
 
     return convertedCompilerOptions.options;
+}
+
+function writeFile(output: string, input: string): void {
+    // tslint:disable-next-line non-literal-fs-path
+    fs.writeFile(output, input, 'binary', (errNoException: NodeJS.ErrnoException | null): void => {
+        if (errNoException !== null) {
+            throw errNoException;
+        }
+
+        console.log('The file was saved!');
+    });
+}
+
+function requestImageFile(output: string, input: string, extension: string): void {
+    http.get({
+        host: 'www.plantuml.com',
+        path: `/plantuml/${extension}/${encode(input)}`
+    },       (res: http.IncomingMessage): void => {
+        let imagedata: string = '';
+        res.setEncoding('binary');
+
+        res.on('data', (chunk: string): void => {
+            imagedata += chunk;
+        });
+
+        res.on('error', (err: Error): void => {
+            throw err;
+        });
+
+        res.on('end', (): void => {
+            writeFile(output, imagedata);
+        });
+    });
 }
