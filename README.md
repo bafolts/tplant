@@ -1,12 +1,25 @@
 # tplant
-Typescript to PlantUML
+Typescript to UML (PlantUML)
 
-Will convert a Typescript file to a PlantUML file. Following all inheritances.
+Will convert a Typescript file to UML diagram. Following all inheritances.
 
 ## Usage
 
-```
+### Install
+```shell
 npm install --global tplant
+```
+
+### Generate image file (svg or png)
+```shell
+tplant --input test/Playground/**/*.ts --output test/Playground/Playground.svg
+tplant --input test/Playground/Classes/Greeter.ts --output test/Playground/Classes/Greeter.png
+```
+> Internet connection is required
+
+### Generate puml file
+```shell
+tplant --input test/Playground/**/*.ts --output test/Playground/Playground.puml
 tplant --input test/Playground/Classes/Greeter.ts --output test/Playground/Classes/Greeter.puml
 ```
 
@@ -45,7 +58,7 @@ Car *-- Wheel
 @enduml
 ```
 ### -I, --only-interfaces
-    Only output interfaces
+    Only convert interfaces
 
 # References
 https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API

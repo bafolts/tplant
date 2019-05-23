@@ -16,21 +16,14 @@ export class Namespace implements IComponentComposite {
 
     public toPUML(): string {
         const result: string[] = [];
-        const declaration: string[] = [];
-        declaration.push(`namespace ${this.name}`);
-        if (this.parts.length > 0) {
-            declaration.push(' {');
-        }
-        result.push(declaration.join(''));
+        result.push(`namespace ${this.name} {`);
         this.parts.forEach((part: IComponentComposite): void => {
             result.push(
                 part.toPUML()
                     .replace(/^(?!\s*$)/gm, '    ')
             );
         });
-        if (this.parts.length > 0) {
-            result.push('}');
-        }
+        result.push('}');
 
         return result.join(os.EOL);
     }
