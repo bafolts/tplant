@@ -9,6 +9,7 @@ describe('Parse Playground codes', () => {
                 ['@startuml',
                     'abstract class AbstractClass {',
                     '    +{abstract} ToTest(): any',
+                    '    +{abstract} PropTest: number',
                     '}',
                     '@enduml'].join(os.EOL)
             );

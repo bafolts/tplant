@@ -10,6 +10,7 @@ export class Property implements IComponentComposite {
     public readonly name: string;
     public modifier: Modifier = 'public';
     public returnType: string = 'any';
+    public isAbstract: boolean = false;
     public isOptional: boolean = false;
     public isStatic: boolean = false;
 
@@ -18,7 +19,11 @@ export class Property implements IComponentComposite {
     }
 
     public toPUML(): string {
-        return `${{ public: '+', private: '-', protected: '#' }[this.modifier]}${(this.isStatic ? '{static} ' : '')
-            }${this.name}${(this.isOptional ? '?' : '')}: ${this.returnType}`;
+        let result: string = { public: '+', private: '-', protected: '#' }[this.modifier];
+        result += (this.isAbstract ? '{abstract} ' : '');
+        result += (this.isStatic ? '{static} ' : '');
+        result += `${this.name}${(this.isOptional ? '?' : '')}: ${this.returnType}`;
+
+        return result;
     }
 }
