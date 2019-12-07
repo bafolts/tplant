@@ -15,7 +15,7 @@ import { tplant } from './tplant';
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
 commander
-    .version('2.3.1')
+    .version('2.3.2')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
@@ -64,7 +64,7 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
     }
 
     // tslint:disable-next-line non-literal-fs-path
-    fs.writeFileSync(<string>commander.output, plantUMLDocument, 'binary');
+    fs.writeFileSync(<string>commander.output, plantUMLDocument, 'utf-8');
 });
 
 function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | undefined {
@@ -140,7 +140,7 @@ function requestImageFile(output: string, input: string, extension: string): voi
     },       (res: http.IncomingMessage): void => {
         // tslint:disable-next-line non-literal-fs-path
         const fileStream: fs.WriteStream = fs.createWriteStream(output);
-        res.setEncoding('binary');
+        res.setEncoding('utf-8');
         res.pipe(fileStream);
         res.on('error', (err: Error): void => {
             throw err;
