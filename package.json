@@ -53,7 +53,6 @@
     "jest": "^24.8.0",
     "pre-commit": "^1.2.2",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.5.4",
     "tslint": "^5.16.0",
     "tslint-microsoft-contrib": "^6.1.1"
   },
