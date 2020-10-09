@@ -14,16 +14,6 @@ before_script:
   - echo "NPM_PACKAGE_VERSION=$NPM_PACKAGE_VERSION"
   - echo "TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST"
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
-  - |
-    if [ "$REPO_VERSION" != "$TPLANT_VERSION" ]; then
-      echo -e '\033[0;31mPackage version and commander version must be the same.';
-      travis_terminate 1;
-    fi
-  - |
-    if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$REPO_VERSION" == "$NPM_PACKAGE_VERSION" ]; then
-      echo -e '\033[0;31mPackage version must be higher than the current one.';
-      travis_terminate 1;
-    fi
   - npm run lint
 
 jobs:
