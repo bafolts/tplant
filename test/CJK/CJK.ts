@@ -4,7 +4,12 @@ namespace CJK {
      *
      * Some classes might contains some Chinese characters
      */
-    class ChineseCharacters {
+    export class ChineseCharacters {
         public 你好: string = '';
     }
 }
+
+class SomeDeal {
+    public cjk: CJK.ChineseCharacters;
+}
+
