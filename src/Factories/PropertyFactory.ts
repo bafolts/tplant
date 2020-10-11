@@ -9,7 +9,13 @@ export namespace PropertyFactory {
         result.isAbstract = ComponentFactory.isAbstract(namedDeclaration);
         result.isOptional = ComponentFactory.isOptional(<ts.PropertyDeclaration>namedDeclaration);
         result.isStatic = ComponentFactory.isStatic(namedDeclaration);
-        result.returnType = checker.typeToString(checker.getTypeOfSymbolAtLocation(signature, signature.valueDeclaration));
+        result.returnType = checker.typeToString(
+            checker.getTypeOfSymbolAtLocation(
+                signature,
+                signature.valueDeclaration
+            ),
+            namedDeclaration
+        );
 
         return result;
     }
