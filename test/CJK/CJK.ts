@@ -11,5 +11,6 @@ namespace CJK {
 
 class SomeDeal {
     public cjk: CJK.ChineseCharacters;
+    public getIt(arg1: CJK.ChineseCharacters): CJK.ChineseCharacters;
 }
 
