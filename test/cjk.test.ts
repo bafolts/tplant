@@ -12,6 +12,7 @@ namespace CJK {
 }
 class SomeDeal {
     +cjk: CJK.ChineseCharacters
+    +getIt(arg1: CJK.ChineseCharacters): CJK.ChineseCharacters
 }
 @enduml`);
     });
