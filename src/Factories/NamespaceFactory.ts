@@ -14,7 +14,7 @@ export namespace NamespaceFactory {
 
         const declaration: ts.NamespaceDeclaration | undefined = namespaceDeclarations[namespaceDeclarations.length - 1];
 
-        if (declaration === undefined || (<ts.ModuleBlock>declaration.body).statements === undefined) {
+        if (declaration === undefined || declaration.body === undefined || (<ts.ModuleBlock>declaration.body).statements === undefined) {
             return result;
         }
 
