@@ -150,4 +150,19 @@ describe('Parse Handbook codes', () => {
                 '}',
                 '@enduml'].join(os.EOL));
     });
+
+    it('generate PlantUML for Interfaces/ExtendingInterfaces.ts', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Handbook/Interfaces/ExtendingInterfaces.ts'])))
+            .toEqual(`@startuml
+interface Shape {
+    +color: string
+}
+interface PenStroke {
+    +penWidth: number
+}
+interface Square extends Shape, PenStroke {
+    +sideLength: number
+}
+@enduml`);
+    });
 });
