@@ -89,8 +89,8 @@ export namespace ComponentFactory {
         return 'public';
     }
 
-    export function getExtendsHeritageClauseName(heritageClause: ts.HeritageClause): string {
-        return (<ts.Identifier>heritageClause.types[0].expression).text;
+    export function getExtendsHeritageClauseNames(heritageClause: ts.HeritageClause): string[] {
+        return heritageClause.types.map(getInterfaceName);
     }
 
     function getInterfaceName(nodeObject: ts.ExpressionWithTypeArguments): string {
