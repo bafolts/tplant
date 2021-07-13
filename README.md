@@ -43,7 +43,7 @@ class Wheel {
     public size: number;
 }
 class Car {
-    public wheel: Wheel;
+    public wheel: Wheel[];
 }
 ```
 ```plantuml
@@ -54,7 +54,7 @@ class Wheel {
 class Car {
     +wheel: Wheel
 }
-Car *-- Wheel
+Car --> "*" Wheel
 @enduml
 ```
 ### -I, --only-interfaces
