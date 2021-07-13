@@ -69,7 +69,7 @@ export namespace tplant {
         });
 
         if (options.associations) {
-            lines.push(...createCompositions(files));
+            lines.push(...createAssociations(files));
         }
 
         lines.push('@enduml');
@@ -77,8 +77,8 @@ export namespace tplant {
         return lines.join(os.EOL);
     }
 
-    function createCompositions(files: IComponentComposite[]): string[] {
-        const compositions: string[] = [];
+    function createAssociations(files: IComponentComposite[]): string[] {
+        const associations: string[] = [];
 
         const mappedTypes: { [x: string]: boolean } = {};
         const outputConstraints: { [x: string]: boolean } = {};
@@ -130,7 +130,7 @@ export namespace tplant {
                         const key: string = `${part.name} ${REFERENCE_LINE} "${cardinality}" ${typeName}`;
                         if (typeName !== part.name &&
                             !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
-                            compositions.push(key);
+                            associations.push(key);
                             outputConstraints[key] = true;
                         }
                     }
@@ -139,6 +139,6 @@ export namespace tplant {
             });
         });
 
-        return compositions;
+        return associations;
     }
 }

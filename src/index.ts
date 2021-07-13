@@ -24,7 +24,6 @@ commander
         ' The argument can be a file path to a valid JSON configuration file,' +
         ' or a directory path to a directory containing a tsconfig.json file.'
     )
-//    .option('-C, --compositions', 'Create not heritage compositions')
     .option('-A, --associations', 'Show associations between classes with cardinalities')
     .option('-I, --only-interfaces', 'Only output interfaces')
     .parse(process.argv);

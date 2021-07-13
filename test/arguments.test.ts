@@ -19,7 +19,7 @@ describe('Test commander options', () => {
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for RayTracer with compositions', () => {
+    it('generate PlantUML for RayTracer with associations', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
@@ -141,7 +141,7 @@ describe('Test commander options', () => {
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for Generics/Complex.ts with compositions', () => {
+    it('generate PlantUML for Generics/Complex.ts with associations', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/Complex.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
@@ -180,7 +180,7 @@ describe('Test commander options', () => {
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for Generics/RecursiveGenericType.ts with compositions', () => {
+    it('generate PlantUML for Generics/RecursiveGenericType.ts with associations', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/RecursiveGenericType.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
@@ -210,7 +210,7 @@ describe('Test commander options', () => {
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for RayTracer with compositions and only Interfaces', () => {
+    it('generate PlantUML for RayTracer with associations and only Interfaces', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { associations: true, onlyInterfaces: true }))
             .toEqual(
                 ['@startuml',

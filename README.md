@@ -35,8 +35,8 @@ tplant --input test/Playground/Classes/Greeter.ts --output test/Playground/Class
     Compile a project given a valid configuration file.
     The argument can be a file path to a valid JSON configuration file, or a directory path to a directory containing a tsconfig.json file.
 
-### -C, --compositions
-    Create not heritage compositions.
+### -A, --associations
+    Show associations between classes with cardinalities
     Example:
 ```typescript
 class Wheel {
