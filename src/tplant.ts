@@ -12,8 +12,9 @@ import { IComponentComposite } from './Models/IComponentComposite';
 import { FileFactory } from './Factories/FileFactory';
 import { ICommandOptions } from './Models/ICommandOptions';
 
-const COMPOSITION_LINE: string = '*--';
+const REFERENCE_LINE: string = '-->';
 const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
+const REGEX_TYPE_NAMES_WITH_ARRAY: RegExp = /\w+(?:\[\])?/g;
 
 export namespace tplant {
 
@@ -113,15 +114,22 @@ export namespace tplant {
                         });
                     }
 
-                    const returnTypes: string[] | null = (<Method | Property>member).returnType.match(REGEX_ONLY_TYPE_NAMES);
+                    // include the fact the type is an array, to support cardinalities
+                    const returnTypes: string[] | null = (<Method | Property>member).returnType.match(REGEX_TYPE_NAMES_WITH_ARRAY);
                     if (returnTypes !== null) {
                         checks = checks.concat(returnTypes);
                     }
 
-                    for (const allTypeName of checks) {
-                        const key: string = `${part.name} ${COMPOSITION_LINE} ${allTypeName}`;
-                        if (allTypeName !== part.name &&
-                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(allTypeName)) {
+                    for (const tempTypeName of checks) {
+                        let typeName = tempTypeName;
+                        let cardinality = '1';
+                        if (tempTypeName.endsWith('[]')) {
+                            cardinality = '*';
+                            typeName = typeName.substring(0, typeName.indexOf('[]'));
+                        }
+                        const key: string = `${part.name} ${REFERENCE_LINE} "${cardinality}" ${typeName}`;
+                        if (typeName !== part.name &&
+                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
                             compositions.push(key);
                             outputConstraints[key] = true;
                         }
