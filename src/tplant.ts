@@ -46,7 +46,7 @@ export namespace tplant {
     }
 
     export function convertToPlant(files: IComponentComposite[], options: ICommandOptions = {
-        compositions: false,
+        associations: false,
         onlyInterfaces: false
     }): string {
 
@@ -68,7 +68,7 @@ export namespace tplant {
             }
         });
 
-        if (options.compositions) {
+        if (options.associations) {
             lines.push(...createCompositions(files));
         }
 
