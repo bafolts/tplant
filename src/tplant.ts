@@ -121,8 +121,8 @@ export namespace tplant {
                     }
 
                     for (const tempTypeName of checks) {
-                        let typeName = tempTypeName;
-                        let cardinality = '1';
+                        let typeName: string = tempTypeName;
+                        let cardinality: string = '1';
                         if (tempTypeName.endsWith('[]')) {
                             cardinality = '*';
                             typeName = typeName.substring(0, typeName.indexOf('[]'));
