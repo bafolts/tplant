@@ -12,8 +12,9 @@ import { IComponentComposite } from './Models/IComponentComposite';
 import { FileFactory } from './Factories/FileFactory';
 import { ICommandOptions } from './Models/ICommandOptions';
 
-const COMPOSITION_LINE: string = '*--';
+const REFERENCE_LINE: string = '-->';
 const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
+const REGEX_TYPE_NAMES_WITH_ARRAY: RegExp = /\w+(?:\[\])?/g;
 
 export namespace tplant {
 
@@ -45,7 +46,7 @@ export namespace tplant {
     }
 
     export function convertToPlant(files: IComponentComposite[], options: ICommandOptions = {
-        compositions: false,
+        associations: false,
         onlyInterfaces: false
     }): string {
 
@@ -67,8 +68,8 @@ export namespace tplant {
             }
         });
 
-        if (options.compositions) {
-            lines.push(...createCompositions(files));
+        if (options.associations) {
+            lines.push(...createAssociations(files));
         }
 
         lines.push('@enduml');
@@ -76,8 +77,8 @@ export namespace tplant {
         return lines.join(os.EOL);
     }
 
-    function createCompositions(files: IComponentComposite[]): string[] {
-        const compositions: string[] = [];
+    function createAssociations(files: IComponentComposite[]): string[] {
+        const associations: string[] = [];
 
         const mappedTypes: { [x: string]: boolean } = {};
         const outputConstraints: { [x: string]: boolean } = {};
@@ -113,16 +114,23 @@ export namespace tplant {
                         });
                     }
 
-                    const returnTypes: string[] | null = (<Method | Property>member).returnType.match(REGEX_ONLY_TYPE_NAMES);
+                    // include the fact the type is an array, to support cardinalities
+                    const returnTypes: string[] | null = (<Method | Property>member).returnType.match(REGEX_TYPE_NAMES_WITH_ARRAY);
                     if (returnTypes !== null) {
                         checks = checks.concat(returnTypes);
                     }
 
-                    for (const allTypeName of checks) {
-                        const key: string = `${part.name} ${COMPOSITION_LINE} ${allTypeName}`;
-                        if (allTypeName !== part.name &&
-                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(allTypeName)) {
-                            compositions.push(key);
+                    for (const tempTypeName of checks) {
+                        let typeName: string = tempTypeName;
+                        let cardinality: string = '1';
+                        if (tempTypeName.endsWith('[]')) {
+                            cardinality = '*';
+                            typeName = typeName.substring(0, typeName.indexOf('[]'));
+                        }
+                        const key: string = `${part.name} ${REFERENCE_LINE} "${cardinality}" ${typeName}`;
+                        if (typeName !== part.name &&
+                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
+                            associations.push(key);
                             outputConstraints[key] = true;
                         }
                     }
@@ -131,6 +139,6 @@ export namespace tplant {
             });
         });
 
-        return compositions;
+        return associations;
     }
 }

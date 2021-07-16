@@ -4,7 +4,7 @@ import { tplant } from '../src/tplant';
 describe('Test commander options', () => {
 
     it('generate PlantUML with only Interfaces for Playground/Inheritance/autos.ts', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Inheritance/autos.ts']), { compositions: false, onlyInterfaces: true }))
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Inheritance/autos.ts']), { associations: false, onlyInterfaces: true }))
             .toEqual(
                 ['@startuml',
                     'interface IVehicle {',
@@ -19,8 +19,8 @@ describe('Test commander options', () => {
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for RayTracer with compositions', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { compositions: true, onlyInterfaces: false }))
+    it('generate PlantUML for RayTracer with associations', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
                     'class Vector {',
@@ -110,39 +110,39 @@ describe('Test commander options', () => {
                     '    -getNaturalColor(thing: Thing, pos: Vector, norm: Vector, rd: Vector, scene: Scene): any',
                     '    +render(scene: any, ctx: any, screenWidth: any, screenHeight: any): void',
                     '}',
-                    'Ray *-- Vector',
-                    'Intersection *-- Thing',
-                    'Intersection *-- Ray',
-                    'Surface *-- Vector',
-                    'Surface *-- Color',
-                    'Thing *-- Ray',
-                    'Thing *-- Intersection',
-                    'Thing *-- Vector',
-                    'Thing *-- Surface',
-                    'Light *-- Vector',
-                    'Light *-- Color',
-                    'Camera *-- Vector',
-                    'Scene *-- Thing',
-                    'Scene *-- Light',
-                    'Scene *-- Camera',
-                    'Plane *-- Vector',
-                    'Plane *-- Ray',
-                    'Plane *-- Intersection',
-                    'Plane *-- Surface',
-                    'Sphere *-- Vector',
-                    'Sphere *-- Surface',
-                    'Sphere *-- Ray',
-                    'RayTracer *-- Ray',
-                    'RayTracer *-- Scene',
-                    'RayTracer *-- Intersection',
-                    'RayTracer *-- Color',
-                    'RayTracer *-- Thing',
-                    'RayTracer *-- Vector',
+                    'Ray --> "1" Vector',
+                    'Intersection --> "1" Thing',
+                    'Intersection --> "1" Ray',
+                    'Surface --> "1" Vector',
+                    'Surface --> "1" Color',
+                    'Thing --> "1" Ray',
+                    'Thing --> "1" Intersection',
+                    'Thing --> "1" Vector',
+                    'Thing --> "1" Surface',
+                    'Light --> "1" Vector',
+                    'Light --> "1" Color',
+                    'Camera --> "1" Vector',
+                    'Scene --> "*" Thing',
+                    'Scene --> "*" Light',
+                    'Scene --> "1" Camera',
+                    'Plane --> "1" Vector',
+                    'Plane --> "1" Ray',
+                    'Plane --> "1" Intersection',
+                    'Plane --> "1" Surface',
+                    'Sphere --> "1" Vector',
+                    'Sphere --> "1" Surface',
+                    'Sphere --> "1" Ray',
+                    'RayTracer --> "1" Ray',
+                    'RayTracer --> "1" Scene',
+                    'RayTracer --> "1" Intersection',
+                    'RayTracer --> "1" Color',
+                    'RayTracer --> "1" Thing',
+                    'RayTracer --> "1" Vector',
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for Generics/Complex.ts with compositions', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/Complex.ts']), { compositions: true, onlyInterfaces: false }))
+    it('generate PlantUML for Generics/Complex.ts with associations', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/Complex.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
                     'interface GenericInterface<T extends string> {',
@@ -172,16 +172,16 @@ describe('Test commander options', () => {
                     '    +genericReturnType2(): GenericInterface3<string, number>',
                     '    +genericParameter(parameter: GenericInterface2<string>): void',
                     '}',
-                    'GenericTypes *-- GenericClass',
-                    'GenericTypes *-- GenericClass2',
-                    'GenericTypes *-- GenericInterface',
-                    'GenericTypes *-- GenericInterface3',
-                    'GenericTypes *-- GenericInterface2',
+                    'GenericTypes --> "1" GenericClass',
+                    'GenericTypes --> "1" GenericClass2',
+                    'GenericTypes --> "1" GenericInterface',
+                    'GenericTypes --> "1" GenericInterface3',
+                    'GenericTypes --> "1" GenericInterface2',
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for Generics/RecursiveGenericType.ts with compositions', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/RecursiveGenericType.ts']), { compositions: true, onlyInterfaces: false }))
+    it('generate PlantUML for Generics/RecursiveGenericType.ts with associations', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/RecursiveGenericType.ts']), { associations: true, onlyInterfaces: false }))
             .toEqual(
                 ['@startuml',
                     'interface FirstGeneric<T> {',
@@ -202,16 +202,16 @@ describe('Test commander options', () => {
                     'interface RecursiveGenericType {',
                     '    +recursiveGenericType: string | number | FirstGeneric<SecondGeneric<ThirdGeneric<NormalInterface> | NormalInterface_2>>',
                     '}',
-                    'RecursiveGenericType *-- FirstGeneric',
-                    'RecursiveGenericType *-- SecondGeneric',
-                    'RecursiveGenericType *-- ThirdGeneric',
-                    'RecursiveGenericType *-- NormalInterface',
-                    'RecursiveGenericType *-- NormalInterface_2',
+                    'RecursiveGenericType --> "1" FirstGeneric',
+                    'RecursiveGenericType --> "1" SecondGeneric',
+                    'RecursiveGenericType --> "1" ThirdGeneric',
+                    'RecursiveGenericType --> "1" NormalInterface',
+                    'RecursiveGenericType --> "1" NormalInterface_2',
                     '@enduml'].join(os.EOL));
     });
 
-    it('generate PlantUML for RayTracer with compositions and only Interfaces', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { compositions: true, onlyInterfaces: true }))
+    it('generate PlantUML for RayTracer with associations and only Interfaces', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), { associations: true, onlyInterfaces: true }))
             .toEqual(
                 ['@startuml',
                     'interface Ray {',
@@ -245,13 +245,13 @@ describe('Test commander options', () => {
                     '    +lights: Light[]',
                     '    +camera: Camera',
                     '}',
-                    'Intersection *-- Thing',
-                    'Intersection *-- Ray',
-                    'Thing *-- Ray',
-                    'Thing *-- Intersection',
-                    'Thing *-- Surface',
-                    'Scene *-- Thing',
-                    'Scene *-- Light',
+                    'Intersection --> "1" Thing',
+                    'Intersection --> "1" Ray',
+                    'Thing --> "1" Ray',
+                    'Thing --> "1" Intersection',
+                    'Thing --> "1" Surface',
+                    'Scene --> "*" Thing',
+                    'Scene --> "*" Light',
                     '@enduml'].join(os.EOL));
     });
 

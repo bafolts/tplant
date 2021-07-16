@@ -1,4 +1,4 @@
 export interface ICommandOptions {
-    compositions: boolean;
+    associations: boolean;
     onlyInterfaces: boolean;
 }
