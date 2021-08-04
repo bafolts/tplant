@@ -6,10 +6,13 @@ import { Interface } from './Components/Interface';
 import { Method } from './Components/Method';
 import { Parameter } from './Components/Parameter';
 import { Property } from './Components/Property';
+import { PlantUMLFormat } from './Formatter/PlantUMLFormat';
 import { ComponentKind } from './Models/ComponentKind';
+import { Formatter } from './Models/Formatter';
 import { IComponentComposite } from './Models/IComponentComposite';
 
 import { FileFactory } from './Factories/FileFactory';
+import { MermaidFormat } from './Formatter/MermaidFormat';
 import { ICommandOptions } from './Models/ICommandOptions';
 
 const REFERENCE_LINE: string = '-->';
@@ -47,7 +50,8 @@ export namespace tplant {
 
     export function convertToPlant(files: IComponentComposite[], options: ICommandOptions = {
         associations: false,
-        onlyInterfaces: false
+        onlyInterfaces: false,
+        format: 'plantuml'
     }): string {
 
         const lines: string[] = [];
@@ -59,25 +63,31 @@ export namespace tplant {
             }
         }
 
-        lines.push('@startuml');
+        let formatter : Formatter;
+        if (options.format === 'mermaid') {
+            formatter = new MermaidFormat();
+        } else {
+            formatter = new PlantUMLFormat();
+        }
+
+        lines.push(...formatter.header());
 
         files.forEach((file: IComponentComposite): void => {
-            const conversion: string = file.toPUML();
+            const conversion: string = formatter.serialize(file);
             if (conversion !== '') {
                 lines.push(conversion);
             }
         });
 
         if (options.associations) {
-            lines.push(...createAssociations(files));
+            lines.push(...createAssociations(files, formatter));
         }
-
-        lines.push('@enduml');
+        lines.push(...formatter.footer());
 
         return lines.join(os.EOL);
     }
 
-    function createAssociations(files: IComponentComposite[]): string[] {
+    function createAssociations(files: IComponentComposite[], formatter: Formatter): string[] {
         const associations: string[] = [];
 
         const mappedTypes: { [x: string]: boolean } = {};
@@ -130,7 +140,7 @@ export namespace tplant {
                         const key: string = `${part.name} ${REFERENCE_LINE} "${cardinality}" ${typeName}`;
                         if (typeName !== part.name &&
                             !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
-                            associations.push(key);
+                            associations.push(...formatter.addAssociation(part.name, REFERENCE_LINE, cardinality, typeName));
                             outputConstraints[key] = true;
                         }
                     }
