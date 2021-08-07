@@ -1,0 +1,34 @@
+classDiagram
+IVehicle <|.. Vehicle
+class Vehicle {
+    +color: string
+    +start(type: string): string
+}
+class IVehicle {
+    +start(type: string): string
+}
+<<Interface>> IVehicle
+Vehicle <|-- Car
+class Car {
+    +start(): string
+}
+class ITrunk {
+    +openTrunk(): void
+}
+<<Interface>> ITrunk
+class IWindow {
+    +openWindow(): void
+}
+<<Interface>> IWindow
+Car <|-- Sedan
+ITrunk <|.. Sedan
+IWindow <|.. Sedan
+class Sedan {
+    +start(): string
+    +openTrunk(): void
+    +openWindow(): void
+}
+Vehicle <|-- Truck
+class Truck {
+    +start(): string
+}

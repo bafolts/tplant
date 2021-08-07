@@ -24,9 +24,9 @@ export class PlantUMLFormat extends Formatter {
         return ['@enduml'];
     }
 
-    public addAssociation(type1: string, line: string, cardinality: string, type2: string) : string[] {
+    public addAssociation(type1: string, cardinality: string, type2: string) : string[] {
         return [
-            `${type1} ${line} "${cardinality}" ${type2}`
+            `${type1} --> "${cardinality}" ${type2}`
         ];
     }
 

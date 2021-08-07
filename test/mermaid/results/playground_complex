@@ -1,0 +1,39 @@
+classDiagram
+class GenericInterface~T~ {
+    +method(arg: T): T
+}
+<<Interface>> GenericInterface
+class GenericInterface2~T~ {
+    +property?: T
+}
+<<Interface>> GenericInterface2
+GenericInterface2 <|.. GenericInterface3
+class GenericInterface3~T, A~ {
+    +method2(arg: A): A
+}
+<<Interface>> GenericInterface3
+GenericInterface <|.. GenericClass
+GenericInterface3 <|.. GenericClass
+class GenericClass~T, A~ {
+    +property?: T
+    +method(arg: T): T
+    +method2(arg: A): A
+}
+GenericInterface2 <|.. GenericClass2
+class GenericClass2~T~ {
+    +property?: T
+}
+GenericClass <|-- ConcreteClass
+GenericInterface <|.. ConcreteClass
+GenericInterface2 <|.. ConcreteClass
+class ConcreteClass {
+    +property: string
+}
+class GenericTypes {
+    +genericType: GenericClass<string, number>
+    +genericType2: GenericClass2<string>
+    +genericReturnType(): GenericInterface<string>
+    +genericReturnType2(): GenericInterface3<string, number>
+    +genericParameter(parameter: GenericInterface2<string>): void
+}
+<<Interface>> GenericTypes

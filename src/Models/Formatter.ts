@@ -12,6 +12,9 @@ import { TypeParameter } from '../Components/TypeParameter';
 import { ComponentKind } from './ComponentKind';
 import { IComponentComposite } from './IComponentComposite';
 
+const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
+const REGEX_TYPE_NAMES_WITH_ARRAY: RegExp = /\w+(?:\[\])?/g;
+
 /**
  * Define a format for class diagram
  */
@@ -26,7 +29,7 @@ export abstract class Formatter {
     }
 
     // @ts-ignore
-    public addAssociation(type1: string, line: string, cardinality: string, type2: string) : string[] {
+    public addAssociation(type1: string, cardinality: string, type2: string) : string[] {
         return [];
     }
 
@@ -76,5 +79,90 @@ export abstract class Formatter {
             return this.serializeTypeParameter(<TypeParameter> component);
         }
         throw new Error('Unknown Component');
+    }
+
+    public renderFiles(files: IComponentComposite[], associations: boolean) : string {
+        const lines : string[] = [];
+
+        lines.push(...this.header());
+
+        files.forEach((file: IComponentComposite): void => {
+            const conversion: string = this.serialize(file);
+            if (conversion !== '') {
+                lines.push(conversion);
+            }
+        });
+
+        if (associations) {
+            lines.push(...this.createAssociations(files));
+        }
+        lines.push(...this.footer());
+
+        return lines.join(os.EOL);
+    }
+
+    public createAssociations(files: IComponentComposite[]): string[] {
+        const associations: string[] = [];
+
+        const mappedTypes: { [x: string]: boolean } = {};
+        const outputConstraints: { [x: string]: boolean } = {};
+        files.forEach((file: IComponentComposite): void => {
+            (<File>file).parts.forEach((part: IComponentComposite): void => {
+                if (part.componentKind === ComponentKind.CLASS ||
+                    part.componentKind === ComponentKind.INTERFACE ||
+                    part.componentKind === ComponentKind.ENUM
+                ) {
+                    mappedTypes[part.name] = true;
+                }
+            });
+        });
+        files.forEach((file: IComponentComposite): void => {
+            if (file.componentKind !== ComponentKind.FILE) {
+                return;
+            }
+
+            (<File>file).parts.forEach((part: IComponentComposite): void => {
+                if (!(part instanceof Class) && !(part instanceof Interface)) {
+                    return;
+                }
+
+                part.members.forEach((member: IComponentComposite): void => {
+                    let checks: string[] = [];
+
+                    if (member instanceof Method) {
+                        member.parameters.forEach((parameter: IComponentComposite): void => {
+                            const parameters: string[] | null = (<Parameter>parameter).parameterType.match(REGEX_ONLY_TYPE_NAMES);
+                            if (parameters !== null) {
+                                checks = checks.concat(parameters);
+                            }
+                        });
+                    }
+
+                    // include the fact the type is an array, to support cardinalities
+                    const returnTypes: string[] | null = (<Method | Property>member).returnType.match(REGEX_TYPE_NAMES_WITH_ARRAY);
+                    if (returnTypes !== null) {
+                        checks = checks.concat(returnTypes);
+                    }
+
+                    for (const tempTypeName of checks) {
+                        let typeName: string = tempTypeName;
+                        let cardinality: string = '1';
+                        if (tempTypeName.endsWith('[]')) {
+                            cardinality = '*';
+                            typeName = typeName.substring(0, typeName.indexOf('[]'));
+                        }
+                        const key: string = `${part.name} ${cardinality} ${typeName}`;
+                        if (typeName !== part.name &&
+                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
+                            associations.push(...this.addAssociation(part.name, cardinality, typeName));
+                            outputConstraints[key] = true;
+                        }
+                    }
+
+                });
+            });
+        });
+
+        return associations;
     }
 }

@@ -1,6 +1,7 @@
 import * as os from 'os';
 import { Class } from '../Components/Class';
 import { Enum } from '../Components/Enum';
+import { EnumValue } from '../Components/EnumValue';
 import { Interface } from '../Components/Interface';
 import { Method } from '../Components/Method';
 import { Namespace } from '../Components/Namespace';
@@ -30,7 +31,7 @@ export class MermaidFormat extends Formatter {
                 .join(', '));
             firstLine.push('~');
         }
-        firstLine.push('{');
+        firstLine.push(' {');
         if (comp.extendsClass !== undefined) {
             result.push(`${comp.extendsClass} <|-- ${comp.name}`);
         }
@@ -41,7 +42,7 @@ export class MermaidFormat extends Formatter {
         }
         result.push(firstLine.join(''));
         comp.members.forEach((member: IComponentComposite): void => {
-            result.push(`\t${this.serialize(member)}`);
+            result.push(`${this.serialize(member)}`);
         });
 
         result.push('}');
@@ -49,23 +50,29 @@ export class MermaidFormat extends Formatter {
             result.push(`<<abstract>> ${comp.name}`);
         }
 
-        return result.map((l: string) => `\t${l}`)
-            .join(os.EOL);
+        return result.join(os.EOL);
+    }
+
+    public addAssociation(type1: string, cardinality: string, type2: string) : string[] {
+        return [
+            `${type1} ..> "${cardinality}" ${type2}`
+        ];
     }
 
     public serializeEnum(comp: Enum): string {
         const result: string[] = [];
-        let declaration: string = `enum ${comp.name}`;
+        let declaration: string = `class ${comp.name}`;
         if (comp.values.length > 0) {
             declaration += ' {';
         }
         result.push(declaration);
         comp.values.forEach((enumValue: IComponentComposite): void => {
-            result.push(`    ${this.serialize(enumValue)}`);
+            result.push(`${this.serializeEnumValue(<EnumValue> enumValue)}`);
         });
         if (comp.values.length > 0) {
             result.push('}');
         }
+        result.push(`<<enumeration>> ${comp.name}`);
 
         return result.join(os.EOL);
     }
@@ -91,15 +98,14 @@ export class MermaidFormat extends Formatter {
         }
         result.push(firstLine.join(''));
         comp.members.forEach((member: IComponentComposite): void => {
-            result.push(`    ${this.serialize(member)}`);
+            result.push(`${this.serialize(member)}`);
         });
         if (comp.members.length > 0) {
             result.push('}');
         }
         result.push(`<<Interface>> ${comp.name}`);
 
-        return result.map((l: string) => `\t${l}`)
-            .join(os.EOL);
+        return result.join(os.EOL);
     }
 
     public serializeMethod(comp: Method) : string {
@@ -114,16 +120,11 @@ export class MermaidFormat extends Formatter {
     }
 
     public serializeNamespace(comp: Namespace) : string {
-        // Check here
+        // Namespaces are not handled by mermaid-js
         const result: string[] = [];
-        result.push(`namespace ${comp.name} {`);
         comp.parts.forEach((part: IComponentComposite): void => {
-            result.push(
-                this.serialize(part)
-                    .replace(/^(?!\s*$)/gm, '    ')
-            );
+            result.push(this.serialize(part));
         });
-        result.push('}');
 
         return result.join(os.EOL);
     }
@@ -157,4 +158,25 @@ export class MermaidFormat extends Formatter {
         return `${comp.name}`;
     }
 
+    public renderFiles(files: IComponentComposite[], associations: boolean) : string {
+        // Auto-indent
+        let indent : number = 0;
+
+        return super.renderFiles(files, associations)
+            .split(os.EOL)
+            .map((l: string) => {
+                const line : string = '    '.repeat(indent) + l.trim();
+                if (line.endsWith('{')) {
+                    indent += 1;
+                } else if (line.endsWith('}')) {
+                    indent -= 1;
+
+                    return line.substr(4);
+                }
+
+                return line;
+            })
+            .join(os.EOL);
+
+    }
 }

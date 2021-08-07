@@ -1,0 +1,6 @@
+classDiagram
+class AbstractClass {
+    +ToTest()*: any
+    +PropTest*: number
+}
+<<abstract>> AbstractClass
