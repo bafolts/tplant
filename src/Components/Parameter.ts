@@ -1,21 +1,13 @@
 import { ComponentKind } from '../Models/ComponentKind';
-import { IComponentComposite } from '../Models/IComponentComposite';
+import { ComponentComposite } from '../Models/IComponentComposite';
 
 /**
  * Represents the metadata for a parameter within typescript
  */
-export class Parameter implements IComponentComposite {
+export class Parameter extends ComponentComposite {
     public readonly componentKind: ComponentKind = ComponentKind.PARAMETER;
-    public readonly name: string;
     public hasInitializer: boolean = false;
     public isOptional: boolean = false;
     public parameterType: string = 'any';
 
-    constructor(name: string) {
-        this.name = name;
-    }
-
-    public toPUML(): string {
-        return `${this.name}${this.isOptional || this.hasInitializer ? '?' : ''}: ${this.parameterType}`;
-    }
 }

@@ -1,0 +1,7 @@
+classDiagram
+class Greeter {
+    +greeting: string
+    +prefix: string
+    +greet(prefix?: string): string
+    +greet(): string
+}

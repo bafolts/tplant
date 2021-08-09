@@ -1,0 +1,25 @@
+classDiagram
+class FirstGeneric~T~ {
+    +index: T
+}
+<<Interface>> FirstGeneric
+class SecondGeneric~T~ {
+    +index: T
+}
+<<Interface>> SecondGeneric
+class ThirdGeneric~T~ {
+    +index: T
+}
+<<Interface>> ThirdGeneric
+class NormalInterface {
+    +index: any
+}
+<<Interface>> NormalInterface
+class NormalInterface_2 {
+    +index: any
+}
+<<Interface>> NormalInterface_2
+class RecursiveGenericType {
+    +recursiveGenericType: string | number | FirstGeneric<SecondGeneric<ThirdGeneric<NormalInterface> | NormalInterface_2>>
+}
+<<Interface>> RecursiveGenericType

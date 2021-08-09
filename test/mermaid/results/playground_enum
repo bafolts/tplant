@@ -1,0 +1,7 @@
+classDiagram
+class Semaphore {
+    RED
+    GREEN
+    YELLOW
+}
+<<enumeration>> Semaphore

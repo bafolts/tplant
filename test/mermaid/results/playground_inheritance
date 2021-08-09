@@ -1,0 +1,13 @@
+classDiagram
+class Animal {
+    +name: string
+    +move(distanceInMeters?: number): void
+}
+Animal <|-- Horse
+class Horse {
+    +move(distanceInMeters?: number): void
+}
+Animal <|-- Snake
+class Snake {
+    +move(distanceInMeters?: number): void
+}

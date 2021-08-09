@@ -15,7 +15,7 @@ import { tplant } from './tplant';
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
 commander
-    .version('2.3.3')
+    .version('2.4.0')
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
@@ -26,6 +26,7 @@ commander
     )
     .option('-A, --associations', 'Show associations between classes with cardinalities')
     .option('-I, --only-interfaces', 'Only output interfaces')
+    .option('-f, --format <path>', 'Define the format of output')
     .parse(process.argv);
 
 if (!commander.input) {
@@ -44,7 +45,8 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
         tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
         {
             associations: <boolean>commander.associations,
-            onlyInterfaces: <boolean>commander.onlyInterfaces
+            onlyInterfaces: <boolean>commander.onlyInterfaces,
+            format: <string> commander.format
         }
     );
 
