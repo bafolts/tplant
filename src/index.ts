@@ -27,6 +27,7 @@ commander
     .option('-A, --associations', 'Show associations between classes with cardinalities')
     .option('-I, --only-interfaces', 'Only output interfaces')
     .option('-f, --format <path>', 'Define the format of output')
+    .option('-T, --targetClass <className>', 'Display class hierarchy diagram')
     .parse(process.argv);
 
 if (!commander.input) {
@@ -46,7 +47,8 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
         {
             associations: <boolean>commander.associations,
             onlyInterfaces: <boolean>commander.onlyInterfaces,
-            format: <string> commander.format
+            format: <string> commander.format,
+            targetClass: <string> commander.targetClass
         }
     );
 

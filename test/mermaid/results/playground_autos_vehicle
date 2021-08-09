@@ -1,0 +1,24 @@
+classDiagram
+IVehicle <|.. Vehicle
+class Vehicle:::targetClassDiagram {
+    +color: string
+    +start(type: string): string
+}
+class IVehicle {
+    +start(type: string): string
+}
+<<Interface>> IVehicle
+Vehicle <|-- Car
+class Car {
+    +start(): string
+}
+Car <|-- Sedan
+class Sedan {
+    +start(): string
+    +openTrunk(): void
+    +openWindow(): void
+}
+Vehicle <|-- Truck
+class Truck {
+    +start(): string
+}

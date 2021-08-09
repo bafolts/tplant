@@ -50,6 +50,16 @@ describe('Parse Playground codes (with Mermaid)', () => {
             .toEqual(loadResult("autos"));
     });
 
+    it('generate MermaidJS for Inheritance/autos.ts targeting Vehicle', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Inheritance/autos.ts']), {format: "mermaid", associations: false, onlyInterfaces: false, targetClass: "Vehicle"}))
+            .toEqual(loadResult("autos_vehicle"));
+    });
+
+    it('generate MermaidJS for Inheritance/autos.ts targeting Car', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Inheritance/autos.ts']), {format: "mermaid", associations: false, onlyInterfaces: false, targetClass: "Car"}))
+            .toEqual(loadResult("autos_car"));
+    });
+
     it('generate MermaidJS for RayTracer', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/RayTracer/index.ts']), {format: "mermaid", associations: true, onlyInterfaces: false}))
             .toEqual(loadResult("raytracer"));
