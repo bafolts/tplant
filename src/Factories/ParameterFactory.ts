@@ -15,7 +15,7 @@ export namespace ParameterFactory {
         result.parameterType = checker.typeToString(
             checker.getTypeOfSymbolAtLocation(
                 parameterSymbol,
-                <ts.Declaration> parameterSymbol.valueDeclaration
+                parameterSymbol.valueDeclaration
             ),
             declaration
         );
