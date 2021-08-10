@@ -42,7 +42,8 @@ export namespace tplant {
     export function convertToPlant(files: IComponentComposite[], options: ICommandOptions = {
         associations: false,
         onlyInterfaces: false,
-        format: 'plantuml'
+        format: 'plantuml',
+        onlyClasses: false
     }): string {
 
         let formatter : Formatter;
@@ -53,7 +54,12 @@ export namespace tplant {
         }
 
         // Only display interfaces
-        if (options.onlyInterfaces) {
+        if (options.onlyClasses) {
+            for (const file of files) {
+                (<File>file).parts = (<File>file).parts
+                    .filter((part: IComponentComposite): boolean => part.componentKind === ComponentKind.CLASS);
+            }
+        } else if (options.onlyInterfaces) {
             for (const file of files) {
                 (<File>file).parts = (<File>file).parts
                     .filter((part: IComponentComposite): boolean => part.componentKind === ComponentKind.INTERFACE);

@@ -47,7 +47,7 @@ export class PlantUMLFormat extends Formatter {
         if (comp.extendsClass !== undefined) {
             firstLine.push(` extends ${comp.extendsClass}`);
         }
-        if (comp.implementsInterfaces.length > 0) {
+        if (!this.options.onlyClasses && comp.implementsInterfaces.length > 0) {
             firstLine.push(` implements ${comp.implementsInterfaces.join(', ')}`);
         }
         this.serializeMembers(comp, firstLine, result);

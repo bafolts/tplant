@@ -38,7 +38,7 @@ export class MermaidFormat extends Formatter {
         if (comp.extendsClass !== undefined) {
             result.push(`${comp.extendsClass} <|-- ${comp.name}`);
         }
-        if (comp.implementsInterfaces.length > 0) {
+        if (!this.options.onlyClasses && comp.implementsInterfaces.length > 0) {
             comp.implementsInterfaces.map((inter: string) => {
                 result.push(`${inter} <|.. ${comp.name}`);
             });
