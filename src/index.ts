@@ -15,7 +15,7 @@ import { tplant } from './tplant';
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
 commander
-    .version('2.4.0')
+    .version(require('../package').version) // tslint:disable-line
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
