@@ -10,6 +10,7 @@ import { Parameter } from '../Components/Parameter';
 import { Property } from '../Components/Property';
 import { TypeParameter } from '../Components/TypeParameter';
 import { ComponentKind } from './ComponentKind';
+import { ICommandOptions } from './ICommandOptions';
 import { IComponentComposite } from './IComponentComposite';
 
 const REGEX_ONLY_TYPE_NAMES: RegExp = /\w+/g;
@@ -19,6 +20,15 @@ const REGEX_TYPE_NAMES_WITH_ARRAY: RegExp = /\w+(?:\[\])?/g;
  * Define a format for class diagram
  */
 export abstract class Formatter {
+
+    /**
+     * Options sent to the cli
+     */
+    protected options: ICommandOptions;
+
+    constructor(options: ICommandOptions) {
+        this.options = options;
+    }
 
     public header() : string[] {
         return [];

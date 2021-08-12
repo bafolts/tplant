@@ -60,5 +60,14 @@ Car --> "*" Wheel
 ### -I, --only-interfaces
     Only convert interfaces
 
+### -f, --format mermaid
+
+By default it is `plantuml`
+If `mermaid` is specific, then the class diagram is generated for [mermaidjs](https://mermaid-js.github.io/mermaid/#/classDiagram)
+
+### --targetClass MyClass
+
+If specified will generated the hierarchy class diagram of the specified class
+
 # References
 https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API

@@ -24,6 +24,9 @@ export class MermaidFormat extends Formatter {
         const result: string[] = [];
         const firstLine: string[] = [];
         firstLine.push(`class ${comp.name}`);
+        if (comp.name === this.options.targetClass) {
+            firstLine.push(':::targetClassDiagram');
+        }
         if (comp.typeParameters.length > 0) {
             firstLine.push('~');
             firstLine.push(comp.typeParameters
