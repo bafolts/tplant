@@ -4,7 +4,7 @@ import { tplant } from '../src/tplant';
 describe('Parse codes that contains CJK characters', () => {
     it('generate PlantUML for classes that contains CJK characters', () => {
         expect(tplant.convertToPlant(
-                tplant.generateDocumentation(['test/CJK/CJK.ts']), { associations: false, onlyInterfaces: false })
+                tplant.generateDocumentation(['test/CJK/CJK.ts']), { associations: false, onlyInterfaces: false, onlyClasses: false })
                 .replace(/(?:\r\n)/g, '\n') // windows has \r in line endings
                 )
             .toEqual(`@startuml

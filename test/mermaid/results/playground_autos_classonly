@@ -1,0 +1,19 @@
+classDiagram
+class Vehicle {
+    +color: string
+    +start(type: string): string
+}
+Vehicle <|-- Car
+class Car {
+    +start(): string
+}
+Car <|-- Sedan
+class Sedan {
+    +start(): string
+    +openTrunk(): void
+    +openWindow(): void
+}
+Vehicle <|-- Truck
+class Truck {
+    +start(): string
+}
