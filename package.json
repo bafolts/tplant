@@ -18,7 +18,7 @@
     "type": "git",
     "url": "git+https://github.com/bafolts/tplant.git"
   },
-  "license": "ISC",
+  "license": "GPL-3.0",
   "author": "Brian Folts",
   "contributors": [
     "Marcos V. Rubido <me@marcosvrs.com> (https://marcosvrs.com/)"
