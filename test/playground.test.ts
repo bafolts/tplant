@@ -19,6 +19,11 @@ describe('Parse Playground codes', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Classes/Greeter.ts'])))
             .toEqual(
                 ['@startuml',
+                    'namespace very {',
+                    '    namespace special {',
+                    '        class Class',
+                    '    }',
+                    '}',
                     'class Greeter {',
                     '    +greeting: string',
                     '    +prefix: string',
