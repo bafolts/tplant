@@ -1,3 +1,8 @@
+namespace very.special {
+    export class Class {
+    }
+}
+
 export class Greeter {
     greeting: string;
     prefix: string = "Hello, ";
@@ -11,4 +16,5 @@ export class Greeter {
     greet(): string {
         return this.prefix + this.greeting;
     }
+}
 }

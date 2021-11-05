@@ -14,7 +14,20 @@ export namespace NamespaceFactory {
 
         const declaration: ts.NamespaceDeclaration | undefined = namespaceDeclarations[namespaceDeclarations.length - 1];
 
-        if (declaration === undefined || declaration.body === undefined || (<ts.ModuleBlock>declaration.body).statements === undefined) {
+        if (declaration === undefined || declaration.body === undefined) {
+            return result;
+        }
+
+        if (declaration.body.kind === ts.SyntaxKind.ModuleDeclaration) {
+            const childSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(declaration.body.name);
+            if (childSymbol !== undefined) {
+                result.parts = [create(childSymbol, checker)];
+
+                return result;
+            }
+        }
+
+        if ((<ts.ModuleBlock>declaration.body).statements === undefined) {
             return result;
         }
 
