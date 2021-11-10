@@ -23,8 +23,8 @@ describe('Parse Playground codes (with Mermaid)', () => {
     });
 
     it('generate MermaidJS for Classes/Greeter.ts', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Classes/Greeter.ts']), mermaidArguments))
-            .toEqual(loadResult("greeter"));
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Classes/Greeter.ts']), mermaidArguments).trim())
+            .toEqual(loadResult("greeter").trim());
     });
 
     it('generate MermaidJS for Enum/Enum.ts', () => {

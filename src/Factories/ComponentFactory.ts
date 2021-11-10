@@ -89,16 +89,15 @@ export namespace ComponentFactory {
         return 'public';
     }
 
-    export function getExtendsHeritageClauseNames(heritageClause: ts.HeritageClause): string[] {
-        return heritageClause.types.map(getInterfaceName);
-    }
+    export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checker: ts.TypeChecker): string[] {
+        return heritageClause.types.map((nodeObject: ts.ExpressionWithTypeArguments) => {
+            const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
+            if (symbolAtLocation !== undefined) {
+                return checker.getFullyQualifiedName(symbolAtLocation);
+            }
 
-    function getInterfaceName(nodeObject: ts.ExpressionWithTypeArguments): string {
-        return (<ts.Identifier>nodeObject.expression).text;
-    }
-
-    export function getImplementsHeritageClauseNames(heritageClause: ts.HeritageClause): string[] {
-        return heritageClause.types.map(getInterfaceName);
+            return '';
+        });
     }
 
     function isMethod(declaration: ts.NamedDeclaration): boolean {

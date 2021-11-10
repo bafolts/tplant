@@ -1,9 +1,11 @@
 namespace very.special {
     export class Class {
     }
+    export interface Foo {
+    }
 }
 
-export class Greeter {
+export class Greeter implements very.special.Foo {
     greeting: string;
     prefix: string = "Hello, ";
     constructor(message: string) {

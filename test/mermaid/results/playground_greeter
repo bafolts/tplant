@@ -1,6 +1,9 @@
 classDiagram
 class Class {
 }
+class Foo
+<<Interface>> Foo
+very.special.Foo <|.. Greeter
 class Greeter {
     +greeting: string
     +prefix: string
