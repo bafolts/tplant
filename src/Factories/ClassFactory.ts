@@ -32,9 +32,9 @@ export namespace ClassFactory {
             if (heritageClauses !== undefined) {
                 heritageClauses.forEach((heritageClause: ts.HeritageClause): void => {
                     if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
-                        result.extendsClass = ComponentFactory.getExtendsHeritageClauseNames(heritageClause)[0];
+                        result.extendsClass = ComponentFactory.getHeritageClauseNames(heritageClause, checker)[0];
                     } else if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
-                        result.implementsInterfaces = ComponentFactory.getImplementsHeritageClauseNames(heritageClause);
+                        result.implementsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
                     }
                 });
             }
