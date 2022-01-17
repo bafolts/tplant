@@ -18,6 +18,7 @@ const plantuml = require("node-plantuml");
 commander
     .version(pjson.version)
     .option('-i, --input <path>', 'Define the path of the Typescript file')
+    .option('-e, --exclude <path>', 'File(s) to ignore')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
         '-p, --project <path>',
@@ -37,7 +38,13 @@ if (!commander.input) {
     process.exit(1);
 }
 
-G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
+const globOptions: G.IOptions = {};
+
+if (commander.exclude !== undefined) {
+    globOptions.ignore = <string>commander.exclude;
+}
+
+G(<string>commander.input, globOptions, (err: Error | null, matches: string[]): void => {
     if (err !== null) {
         throw err;
     }
