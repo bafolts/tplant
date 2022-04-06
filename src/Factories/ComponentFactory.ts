@@ -95,6 +95,7 @@ export namespace ComponentFactory {
             if (symbolAtLocation !== undefined) {
                 let ogSymbol: any = checker.getAliasedSymbol(symbolAtLocation);
                 while (ogSymbol.parent) { ogSymbol = ogSymbol.parent; }
+
                 return [checker.getFullyQualifiedName(symbolAtLocation), ogSymbol.valueDeclaration.fileName];
             }
 

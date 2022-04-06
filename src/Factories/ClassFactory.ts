@@ -32,11 +32,11 @@ export namespace ClassFactory {
             if (heritageClauses !== undefined) {
                 heritageClauses.forEach((heritageClause: ts.HeritageClause): void => {
                     if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
-                        let extendsClass = ComponentFactory.getHeritageClauseNames(heritageClause, checker)[0];
+                        const extendsClass = ComponentFactory.getHeritageClauseNames(heritageClause, checker)[0];
                         result.extendsClass = extendsClass[0];
                         result.extendsClassFile = extendsClass[1];
                     } else if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
-                        let implementsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
+                        const implementsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
                         result.implementsInterfaces = implementsInterfaces.map(arr => arr[0]);
                         result.implementsInterfacesFiles = implementsInterfaces.map(arr => arr[1]);
                     }
