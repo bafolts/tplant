@@ -18,7 +18,9 @@ export namespace InterfaceFactory {
             if (heritageClauses !== undefined) {
                 heritageClauses.forEach((heritageClause: ts.HeritageClause): void => {
                     if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
-                        result.extendsInterface = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
+                        let extendsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
+                        result.extendsInterface = extendsInterfaces.map(arr => arr[0]);
+                        result.extendsInterfaceFiles = extendsInterfaces.map(arr => arr[1]);
                     }
                 });
             }

@@ -12,7 +12,9 @@ export class Class extends ComponentComposite {
     public constructorMethods: IComponentComposite[] = [];
     public members: IComponentComposite[] = [];
     public extendsClass: string | undefined;
+    public extendsClassFile: string | undefined;
     public implementsInterfaces: string[] = [];
+    public implementsInterfacesFiles: string[] = [];
     public typeParameters: IComponentComposite[] = [];
 
     constructor(name: string, fileName: string) {

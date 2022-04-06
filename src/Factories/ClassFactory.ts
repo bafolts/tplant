@@ -4,7 +4,7 @@ import { ComponentFactory } from './ComponentFactory';
 
 export namespace ClassFactory {
     export function create(fileName: string, classSymbol: ts.Symbol, checker: ts.TypeChecker): Class {
-        const result: Class = new Class(fileName, classSymbol.getName());
+        const result: Class = new Class(classSymbol.getName(), fileName);
         const classDeclaration: ts.ClassDeclaration[] | undefined = <ts.ClassDeclaration[] | undefined>classSymbol.getDeclarations();
 
         if (classDeclaration !== undefined && classDeclaration.length > 0) {
@@ -32,9 +32,13 @@ export namespace ClassFactory {
             if (heritageClauses !== undefined) {
                 heritageClauses.forEach((heritageClause: ts.HeritageClause): void => {
                     if (heritageClause.token === ts.SyntaxKind.ExtendsKeyword) {
-                        result.extendsClass = ComponentFactory.getHeritageClauseNames(heritageClause, checker)[0];
+                        let extendsClass = ComponentFactory.getHeritageClauseNames(heritageClause, checker)[0];
+                        result.extendsClass = extendsClass[0];
+                        result.extendsClassFile = extendsClass[1];
                     } else if (heritageClause.token === ts.SyntaxKind.ImplementsKeyword) {
-                        result.implementsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
+                        let implementsInterfaces = ComponentFactory.getHeritageClauseNames(heritageClause, checker);
+                        result.implementsInterfaces = implementsInterfaces.map(arr => arr[0]);
+                        result.implementsInterfacesFiles = implementsInterfaces.map(arr => arr[1]);
                     }
                 });
             }

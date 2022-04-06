@@ -89,14 +89,16 @@ export namespace ComponentFactory {
         return 'public';
     }
 
-    export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checker: ts.TypeChecker): string[] {
+    export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checker: ts.TypeChecker): string[][] {
         return heritageClause.types.map((nodeObject: ts.ExpressionWithTypeArguments) => {
             const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
             if (symbolAtLocation !== undefined) {
-                return checker.getFullyQualifiedName(symbolAtLocation);
+                let ogSymbol: any = checker.getAliasedSymbol(symbolAtLocation);
+                while (ogSymbol.parent) { ogSymbol = ogSymbol.parent; }
+                return [checker.getFullyQualifiedName(symbolAtLocation), ogSymbol.valueDeclaration.fileName];
             }
 
-            return '';
+            return ['', ''];
         });
     }
 
