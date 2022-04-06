@@ -3,8 +3,8 @@ import { Class } from '../Components/Class';
 import { ComponentFactory } from './ComponentFactory';
 
 export namespace ClassFactory {
-    export function create(classSymbol: ts.Symbol, checker: ts.TypeChecker): Class {
-        const result: Class = new Class(classSymbol.getName());
+    export function create(fileName: string, classSymbol: ts.Symbol, checker: ts.TypeChecker): Class {
+        const result: Class = new Class(fileName, classSymbol.getName());
         const classDeclaration: ts.ClassDeclaration[] | undefined = <ts.ClassDeclaration[] | undefined>classSymbol.getDeclarations();
 
         if (classDeclaration !== undefined && classDeclaration.length > 0) {

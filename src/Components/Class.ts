@@ -6,6 +6,7 @@ import { ComponentComposite, IComponentComposite } from '../Models/IComponentCom
  */
 export class Class extends ComponentComposite {
     public readonly componentKind: ComponentKind = ComponentKind.CLASS;
+    public readonly fileName: string;
     public isAbstract: boolean = false;
     public isStatic: boolean = false;
     public constructorMethods: IComponentComposite[] = [];
@@ -14,4 +15,8 @@ export class Class extends ComponentComposite {
     public implementsInterfaces: string[] = [];
     public typeParameters: IComponentComposite[] = [];
 
+    constructor(name: string, fileName: string) {
+        super(name);
+        this.fileName = fileName;
+    }
 }

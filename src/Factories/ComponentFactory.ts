@@ -20,7 +20,7 @@ export namespace ComponentFactory {
             node.parent.kind === ts.SyntaxKind.ModuleBlock;
     }
 
-    export function create(node: ts.Node, checker: ts.TypeChecker): IComponentComposite[] {
+    export function create(fileName: string, node: ts.Node, checker: ts.TypeChecker): IComponentComposite[] {
         const componentComposites: IComponentComposite[] = [];
 
         ts.forEachChild(node, (childNode: ts.Node) => {
@@ -40,7 +40,7 @@ export namespace ComponentFactory {
                 if (classSymbol === undefined) {
                     return;
                 }
-                componentComposites.push(ClassFactory.create(classSymbol, checker));
+                componentComposites.push(ClassFactory.create(fileName, classSymbol, checker));
 
                 // No need to walk any further, class expressions/inner declarations
                 // cannot be exported
@@ -57,7 +57,7 @@ export namespace ComponentFactory {
                 if (namespaceSymbol === undefined) {
                     return;
                 }
-                componentComposites.push(NamespaceFactory.create(namespaceSymbol, checker));
+                componentComposites.push(NamespaceFactory.create(fileName, namespaceSymbol, checker));
             } else if (childNode.kind === ts.SyntaxKind.EnumDeclaration) {
                 const currentNode: ts.EnumDeclaration = <ts.EnumDeclaration>childNode;
                 const enumSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);

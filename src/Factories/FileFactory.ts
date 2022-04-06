@@ -3,9 +3,9 @@ import { File } from '../Components/File';
 import { ComponentFactory } from './ComponentFactory';
 
 export namespace FileFactory {
-    export function create(sourceFile: ts.Node, checker: ts.TypeChecker): File {
+    export function create(fileName: string, sourceFile: ts.Node, checker: ts.TypeChecker): File {
         const file: File = new File();
-        file.parts = ComponentFactory.create(sourceFile, checker);
+        file.parts = ComponentFactory.create(fileName, sourceFile, checker);
 
         return file;
     }
