@@ -93,11 +93,12 @@ export namespace ComponentFactory {
         return heritageClause.types.map((nodeObject: ts.ExpressionWithTypeArguments) => {
             const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
             if (symbolAtLocation !== undefined) {
-                /* tslint:disable-next-line */
+                // tslint:disable
                 let ogSymbol: any = checker.getAliasedSymbol(symbolAtLocation);
                 while (ogSymbol.parent) { ogSymbol = ogSymbol.parent; }
 
                 return [checker.getFullyQualifiedName(symbolAtLocation), ogSymbol.valueDeclaration.fileName];
+                // tslint:enable
             }
 
             return ['', ''];
