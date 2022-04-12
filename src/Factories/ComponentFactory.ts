@@ -20,7 +20,7 @@ export namespace ComponentFactory {
             node.parent.kind === ts.SyntaxKind.ModuleBlock;
     }
 
-    export function create(node: ts.Node, checker: ts.TypeChecker): IComponentComposite[] {
+    export function create(fileName: string, node: ts.Node, checker: ts.TypeChecker): IComponentComposite[] {
         const componentComposites: IComponentComposite[] = [];
 
         ts.forEachChild(node, (childNode: ts.Node) => {
@@ -40,7 +40,7 @@ export namespace ComponentFactory {
                 if (classSymbol === undefined) {
                     return;
                 }
-                componentComposites.push(ClassFactory.create(classSymbol, checker));
+                componentComposites.push(ClassFactory.create(fileName, classSymbol, checker));
 
                 // No need to walk any further, class expressions/inner declarations
                 // cannot be exported
@@ -57,7 +57,7 @@ export namespace ComponentFactory {
                 if (namespaceSymbol === undefined) {
                     return;
                 }
-                componentComposites.push(NamespaceFactory.create(namespaceSymbol, checker));
+                componentComposites.push(NamespaceFactory.create(fileName, namespaceSymbol, checker));
             } else if (childNode.kind === ts.SyntaxKind.EnumDeclaration) {
                 const currentNode: ts.EnumDeclaration = <ts.EnumDeclaration>childNode;
                 const enumSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
@@ -89,15 +89,30 @@ export namespace ComponentFactory {
         return 'public';
     }
 
-    export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checker: ts.TypeChecker): string[] {
+    export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checker: ts.TypeChecker): string[][] {
         return heritageClause.types.map((nodeObject: ts.ExpressionWithTypeArguments) => {
             const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
             if (symbolAtLocation !== undefined) {
-                return checker.getFullyQualifiedName(symbolAtLocation);
+                const ogFile: string = getOriginalFile(symbolAtLocation, checker);
+
+                return [checker.getFullyQualifiedName(symbolAtLocation), ogFile];
             }
 
-            return '';
+            return ['', ''];
         });
+    }
+
+    export function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string {
+        let deAliasSymbol: ts.Symbol;
+
+        // tslint:disable-next-line:no-bitwise
+        if ((typeSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
+            deAliasSymbol = checker.getAliasedSymbol(typeSymbol);
+        } else {
+            deAliasSymbol = typeSymbol;
+        }
+
+        return deAliasSymbol.declarations[0].getSourceFile().fileName;
     }
 
     function isMethod(declaration: ts.NamedDeclaration): boolean {

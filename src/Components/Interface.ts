@@ -8,5 +8,6 @@ export class Interface extends ComponentComposite {
     public readonly componentKind: ComponentKind = ComponentKind.INTERFACE;
     public members: IComponentComposite[] = [];
     public extendsInterface: string[] = [];
+    public extendsInterfaceFiles: string[] = [];
     public typeParameters: IComponentComposite[] = [];
 }

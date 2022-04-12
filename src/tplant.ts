@@ -29,7 +29,7 @@ export namespace tplant {
         program.getSourceFiles()
             .forEach((sourceFile: ts.SourceFile): void => {
                 if (!sourceFile.isDeclarationFile) {
-                    const file: IComponentComposite | undefined = FileFactory.create(sourceFile, checker);
+                    const file: IComponentComposite | undefined = FileFactory.create(sourceFile.fileName, sourceFile, checker);
                     if (file !== undefined) {
                         result.push(file);
                     }
