@@ -93,16 +93,26 @@ export namespace ComponentFactory {
         return heritageClause.types.map((nodeObject: ts.ExpressionWithTypeArguments) => {
             const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
             if (symbolAtLocation !== undefined) {
-                // tslint:disable
-                let ogSymbol: any = checker.getAliasedSymbol(symbolAtLocation);
-                while (ogSymbol.parent) { ogSymbol = ogSymbol.parent; }
+                const ogFile: string = getOriginalFile(symbolAtLocation, checker);
 
-                return [checker.getFullyQualifiedName(symbolAtLocation), ogSymbol.valueDeclaration.fileName];
-                // tslint:enable
+                return [checker.getFullyQualifiedName(symbolAtLocation), ogFile];
             }
 
             return ['', ''];
         });
+    }
+
+    export function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string {
+        let deAliasSymbol: ts.Symbol;
+
+        // tslint:disable-next-line:no-bitwise
+        if ((typeSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
+            deAliasSymbol = checker.getAliasedSymbol(typeSymbol);
+        } else {
+            deAliasSymbol = typeSymbol;
+        }
+
+        return deAliasSymbol.declarations[0].getSourceFile().fileName;
     }
 
     function isMethod(declaration: ts.NamedDeclaration): boolean {
