@@ -13,7 +13,7 @@ export namespace ParameterFactory {
             declaration = declarations[0];
         }
 
-        const typeOfSymbol = checker.getTypeOfSymbolAtLocation(
+        const typeOfSymbol: ts.Type = checker.getTypeOfSymbolAtLocation(
             parameterSymbol,
             parameterSymbol.valueDeclaration
         );
