@@ -106,7 +106,7 @@ export namespace ComponentFactory {
         let deAliasSymbol: ts.Symbol;
 
         if (!typeSymbol || !checker) { return ''; }
-        
+
         // tslint:disable-next-line:no-bitwise
         if ((typeSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
             deAliasSymbol = checker.getAliasedSymbol(typeSymbol);

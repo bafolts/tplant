@@ -12,7 +12,7 @@ export namespace ParameterFactory {
             result.isOptional = ComponentFactory.isOptional(declarations[0]);
             declaration = declarations[0];
         }
-        
+
         const typeOfSymbol = checker.getTypeOfSymbolAtLocation(
             parameterSymbol,
             parameterSymbol.valueDeclaration
