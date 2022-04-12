@@ -102,9 +102,11 @@ export namespace ComponentFactory {
         });
     }
 
-    export function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string {
+    export function getOriginalFile(typeSymbol?: ts.Symbol, checker?: ts.TypeChecker): string {
         let deAliasSymbol: ts.Symbol;
 
+        if (!typeSymbol || !checker) { return ''; }
+        
         // tslint:disable-next-line:no-bitwise
         if ((typeSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
             deAliasSymbol = checker.getAliasedSymbol(typeSymbol);
