@@ -120,7 +120,7 @@ export namespace ComponentFactory {
 
         let deParameterType: ts.Type = tsType;
         let typeSymbol: ts.Symbol | undefined = tsType.getSymbol();
-      
+
         while (typeSymbol?.name === 'Array') {
             deParameterType = checker.getTypeArguments(<ts.TypeReference>deParameterType)[0];
             typeSymbol = deParameterType.getSymbol();
