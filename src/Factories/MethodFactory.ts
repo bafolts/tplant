@@ -15,7 +15,7 @@ export namespace MethodFactory {
         if (methodSignature !== undefined) {
             const returnType: ts.Type = methodSignature.getReturnType();
             result.returnType = checker.typeToString(returnType, namedDeclaration);
-            result.returnTypeFile = ComponentFactory.getOriginalFile(returnType.getSymbol(), checker);
+            result.returnTypeFile = ComponentFactory.getOriginalFileOriginalType(returnType, checker);
             result.parameters = methodSignature.parameters
                 .map((parameter: ts.Symbol): Parameter => ParameterFactory.create(parameter, checker));
         }

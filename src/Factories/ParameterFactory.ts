@@ -22,7 +22,7 @@ export namespace ParameterFactory {
             declaration
         );
 
-        result.parameterTypeFile = ComponentFactory.getOriginalFile(typeOfSymbol.getSymbol(), checker);
+        result.parameterTypeFile = ComponentFactory.getOriginalFileOriginalType(typeOfSymbol, checker);
 
         return result;
     }
