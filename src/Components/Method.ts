@@ -9,6 +9,7 @@ export class Method extends ComponentComposite {
     public readonly componentKind: ComponentKind = ComponentKind.METHOD;
     public parameters: IComponentComposite[] = [];
     public returnType: string = 'any';
+    public returnTypeFile: string = '';
     public modifier: Modifier = 'public';
     public isAbstract: boolean = false;
     public isOptional: boolean = false;
