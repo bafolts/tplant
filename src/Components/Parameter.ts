@@ -9,5 +9,6 @@ export class Parameter extends ComponentComposite {
     public hasInitializer: boolean = false;
     public isOptional: boolean = false;
     public parameterType: string = 'any';
+    public parameterTypeFile: string = '';
 
 }

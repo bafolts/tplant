@@ -102,7 +102,7 @@ export namespace ComponentFactory {
         });
     }
 
-    export function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string {
+    function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string {
         let deAliasSymbol: ts.Symbol;
 
         // tslint:disable-next-line:no-bitwise
@@ -112,7 +112,23 @@ export namespace ComponentFactory {
             deAliasSymbol = typeSymbol;
         }
 
-        return deAliasSymbol.declarations[0].getSourceFile().fileName;
+        return deAliasSymbol.declarations?.[0].getSourceFile().fileName;
+    }
+
+    export function getOriginalFileOriginalType(tsType: ts.Type, checker: ts.TypeChecker): string {
+        if (tsType === undefined || checker === undefined) { return ''; }
+
+        let deParameterType: ts.Type = tsType;
+        let typeSymbol: ts.Symbol | undefined = tsType.getSymbol();
+
+        while (typeSymbol?.name === 'Array') {
+            deParameterType = checker.getTypeArguments(<ts.TypeReference>deParameterType)[0];
+            typeSymbol = deParameterType.getSymbol();
+        }
+
+        if (typeSymbol === undefined) { return ''; }
+
+        return getOriginalFile(typeSymbol, checker);
     }
 
     function isMethod(declaration: ts.NamedDeclaration): boolean {

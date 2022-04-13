@@ -12,13 +12,17 @@ export namespace ParameterFactory {
             result.isOptional = ComponentFactory.isOptional(declarations[0]);
             declaration = declarations[0];
         }
+
+        const typeOfSymbol: ts.Type = checker.getTypeOfSymbolAtLocation(
+            parameterSymbol,
+            parameterSymbol.valueDeclaration
+        );
         result.parameterType = checker.typeToString(
-            checker.getTypeOfSymbolAtLocation(
-                parameterSymbol,
-                parameterSymbol.valueDeclaration
-            ),
+            typeOfSymbol,
             declaration
         );
+
+        result.parameterTypeFile = ComponentFactory.getOriginalFileOriginalType(typeOfSymbol, checker);
 
         return result;
     }

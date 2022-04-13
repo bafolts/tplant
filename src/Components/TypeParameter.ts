@@ -7,4 +7,5 @@ import { ComponentComposite } from '../Models/IComponentComposite';
 export class TypeParameter extends ComponentComposite {
     public readonly componentKind: ComponentKind = ComponentKind.PARAMETER;
     public constraint: string | undefined;
+    public constraintFile: string | undefined;
 }
