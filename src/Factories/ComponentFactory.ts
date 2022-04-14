@@ -131,6 +131,10 @@ export namespace ComponentFactory {
         return getOriginalFile(typeSymbol, checker);
     }
 
+    function isConstructor(declaration: ts.NamedDeclaration): boolean {
+      return declaration.kind === ts.SyntaxKind.Constructor;
+    }
+
     function isMethod(declaration: ts.NamedDeclaration): boolean {
         return declaration.kind === ts.SyntaxKind.MethodDeclaration ||
             declaration.kind === ts.SyntaxKind.MethodSignature;
@@ -185,6 +189,29 @@ export namespace ComponentFactory {
         }
 
         return false;
+    }
+
+    export function serializeConstructors(
+        memberSymbols: ts.UnderscoreEscapedMap<ts.Symbol>,
+        checker: ts.TypeChecker
+    ): (Property | Method)[] {
+      const result: (Property | Method)[] = [];
+
+      if (memberSymbols !== undefined) {
+          memberSymbols.forEach((memberSymbol: ts.Symbol): void => {
+              const memberDeclarations: ts.NamedDeclaration[] | undefined = memberSymbol.getDeclarations();
+              if (memberDeclarations === undefined) {
+                  return;
+              }
+              memberDeclarations.forEach((memberDeclaration: ts.NamedDeclaration): void => {
+                  if (isConstructor(memberDeclaration)) {
+                      result.push(MethodFactory.create(memberSymbol, memberDeclaration, checker));
+                  }
+              });
+          });
+      }
+
+      return result;
     }
 
     export function serializeMethods(memberSymbols: ts.UnderscoreEscapedMap<ts.Symbol>, checker: ts.TypeChecker): (Property | Method)[] {

@@ -13,6 +13,7 @@ export namespace ClassFactory {
         }
 
         if (classSymbol.members !== undefined) {
+            result.constructorMethods = ComponentFactory.serializeConstructors(classSymbol.members, checker);
             result.members = ComponentFactory.serializeMethods(classSymbol.members, checker);
             result.typeParameters = ComponentFactory.serializeTypeParameters(classSymbol.members, checker);
         }
