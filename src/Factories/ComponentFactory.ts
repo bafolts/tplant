@@ -162,27 +162,13 @@ export namespace ComponentFactory {
         return getModifier(memberModifiers);
     }
 
-    export function isAbstract(memberDeclaration: ts.Declaration): boolean {
+    export function isModifier(memberDeclaration: ts.Declaration, modifierKind: ts.SyntaxKind): boolean {
 
         const memberModifiers: ts.NodeArray<ts.Modifier> | undefined = memberDeclaration.modifiers;
 
         if (memberModifiers !== undefined) {
             for (const memberModifier of memberModifiers) {
-                if (memberModifier.kind === ts.SyntaxKind.AbstractKeyword) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    export function isStatic(memberDeclaration: ts.Declaration): boolean {
-        const memberModifiers: ts.NodeArray<ts.Modifier> | undefined = memberDeclaration.modifiers;
-
-        if (memberModifiers !== undefined) {
-            for (const memberModifier of memberModifiers) {
-                if (memberModifier.kind === ts.SyntaxKind.StaticKeyword) {
+                if (memberModifier.kind === modifierKind) {
                     return true;
                 }
             }

@@ -8,8 +8,8 @@ export namespace ClassFactory {
         const classDeclaration: ts.ClassDeclaration[] | undefined = <ts.ClassDeclaration[] | undefined>classSymbol.getDeclarations();
 
         if (classDeclaration !== undefined && classDeclaration.length > 0) {
-            result.isStatic = ComponentFactory.isStatic(classDeclaration[classDeclaration.length - 1]);
-            result.isAbstract = ComponentFactory.isAbstract(classDeclaration[classDeclaration.length - 1]);
+            result.isStatic = ComponentFactory.isModifier(classDeclaration[classDeclaration.length - 1], ts.SyntaxKind.StaticKeyword);
+            result.isAbstract = ComponentFactory.isModifier(classDeclaration[classDeclaration.length - 1], ts.SyntaxKind.AbstractKeyword);
         }
 
         if (classSymbol.members !== undefined) {
