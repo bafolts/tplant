@@ -9,9 +9,9 @@ export namespace MethodFactory {
     export function create(signature: ts.Symbol, namedDeclaration: ts.NamedDeclaration, checker: ts.TypeChecker): Method {
         const result: Method = new Method(signature.getName());
         result.modifier = ComponentFactory.getMemberModifier(namedDeclaration);
-        result.isAbstract = ComponentFactory.isAbstract(namedDeclaration);
+        result.isAbstract = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.AbstractKeyword);
         result.isOptional = ComponentFactory.isOptional(<ts.MethodDeclaration>namedDeclaration);
-        result.isStatic = ComponentFactory.isStatic(namedDeclaration);
+        result.isStatic = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.StaticKeyword);
         const methodSignature: ts.Signature | undefined = checker.getSignatureFromDeclaration(<ts.MethodDeclaration>namedDeclaration);
         if (methodSignature !== undefined) {
             const returnType: ts.Type = methodSignature.getReturnType();
