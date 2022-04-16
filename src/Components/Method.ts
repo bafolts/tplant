@@ -13,6 +13,7 @@ export class Method extends ComponentComposite {
     public returnTypeFile: string = '';
     public modifier: Modifier = 'public';
     public isAbstract: boolean = false;
+    public isAsync: boolean = false;
     public isOptional: boolean = false;
     public isStatic: boolean = false;
 }
