@@ -255,6 +255,8 @@ describe('Parse Playground codes', () => {
                     '    -getNaturalColor(thing: Thing, pos: Vector, norm: Vector, rd: Vector, scene: Scene): any',
                     '    +render(scene: any, ctx: any, screenWidth: any, screenHeight: any): void',
                     '}',
+                    '+defaultScene(): Scene',
+                    '+exec(): void',
                     '@enduml'].join(os.EOL));
     });
 });
