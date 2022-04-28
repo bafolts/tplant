@@ -31,43 +31,53 @@ export namespace ComponentFactory {
             }
 
             if (childNode.kind === ts.SyntaxKind.ClassDeclaration) {
-                const currentNode: ts.ClassLikeDeclarationBase = <ts.ClassLikeDeclarationBase>childNode;
-                if (currentNode.name === undefined) {
-                    return;
-                }
-                // This is a top level class, get its symbol
-                const classSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
-                if (classSymbol === undefined) {
-                    return;
-                }
-                componentComposites.push(ClassFactory.create(fileName, classSymbol, checker));
-
-                // No need to walk any further, class expressions/inner declarations
-                // cannot be exported
-            } else if (childNode.kind === ts.SyntaxKind.InterfaceDeclaration) {
-                const currentNode: ts.InterfaceDeclaration = <ts.InterfaceDeclaration>childNode;
-                const interfaceSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
-                if (interfaceSymbol === undefined) {
-                    return;
-                }
-                componentComposites.push(InterfaceFactory.create(interfaceSymbol, checker));
-            } else if (childNode.kind === ts.SyntaxKind.ModuleDeclaration) {
-                const currentNode: ts.NamespaceDeclaration = <ts.NamespaceDeclaration>childNode;
-                const namespaceSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
-                if (namespaceSymbol === undefined) {
-                    return;
-                }
-                componentComposites.push(NamespaceFactory.create(fileName, namespaceSymbol, checker));
-            } else if (childNode.kind === ts.SyntaxKind.EnumDeclaration) {
-                const currentNode: ts.EnumDeclaration = <ts.EnumDeclaration>childNode;
-                const enumSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
-                if (enumSymbol === undefined) {
-                    return;
-                }
-                componentComposites.push(EnumFactory.create(enumSymbol));
-
-                return;
+            const currentNode: ts.ClassLikeDeclarationBase = <ts.ClassLikeDeclarationBase>childNode;
+            if (currentNode.name === undefined) {
+              return;
             }
+            // This is a top level class, get its symbol
+            const classSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (classSymbol === undefined) {
+              return;
+            }
+            componentComposites.push(ClassFactory.create(fileName, classSymbol, checker));
+
+            // No need to walk any further, class expressions/inner declarations
+            // cannot be exported
+          } else if (childNode.kind === ts.SyntaxKind.InterfaceDeclaration) {
+            const currentNode: ts.InterfaceDeclaration = <ts.InterfaceDeclaration>childNode;
+            const interfaceSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (interfaceSymbol === undefined) {
+              return;
+            }
+            componentComposites.push(InterfaceFactory.create(interfaceSymbol, checker));
+          } else if (childNode.kind === ts.SyntaxKind.ModuleDeclaration) {
+            const currentNode: ts.NamespaceDeclaration = <ts.NamespaceDeclaration>childNode;
+            const namespaceSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (namespaceSymbol === undefined) {
+              return;
+            }
+            componentComposites.push(NamespaceFactory.create(fileName, namespaceSymbol, checker));
+          } else if (childNode.kind === ts.SyntaxKind.EnumDeclaration) {
+            const currentNode: ts.EnumDeclaration = <ts.EnumDeclaration>childNode;
+            const enumSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (enumSymbol === undefined) {
+              return;
+            }
+            componentComposites.push(EnumFactory.create(enumSymbol));
+
+            return;
+          } else if (childNode.kind === ts.SyntaxKind.FunctionDeclaration) {
+            const currentNode: ts.FunctionDeclaration = <ts.FunctionDeclaration>childNode;
+            if (currentNode.name === undefined) {
+              return;
+            }
+            const functionSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+            if (functionSymbol === undefined) {
+              return;
+            }
+            componentComposites.push(MethodFactory.create(functionSymbol, currentNode, checker));
+          }
         });
 
         return componentComposites;
