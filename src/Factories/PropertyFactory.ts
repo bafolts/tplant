@@ -13,7 +13,7 @@ export namespace PropertyFactory {
         result.returnType = checker.typeToString(
             checker.getTypeOfSymbolAtLocation(
                 signature,
-                signature.valueDeclaration
+                signature.valueDeclaration!
             ),
             namedDeclaration
         );
