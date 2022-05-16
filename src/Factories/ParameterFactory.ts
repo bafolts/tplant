@@ -15,7 +15,7 @@ export namespace ParameterFactory {
 
         const typeOfSymbol: ts.Type = checker.getTypeOfSymbolAtLocation(
             parameterSymbol,
-            parameterSymbol.valueDeclaration!
+            parameterSymbol.valueDeclaration
         );
         result.parameterType = checker.typeToString(
             typeOfSymbol,

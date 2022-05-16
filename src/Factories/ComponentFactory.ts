@@ -122,7 +122,7 @@ export namespace ComponentFactory {
             deAliasSymbol = typeSymbol;
         }
 
-        return deAliasSymbol.declarations?.[0].getSourceFile().fileName || '';
+        return deAliasSymbol.declarations?.[0].getSourceFile().fileName;
     }
 
     export function getOriginalFileOriginalType(tsType: ts.Type, checker: ts.TypeChecker): string {
