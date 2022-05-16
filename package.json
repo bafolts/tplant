@@ -36,7 +36,7 @@
     "build:dev": "tsc --sourceMap -w",
     "lint": "tslint -p .",
     "lint:fix": "tslint -p . --fix",
-    "postinstall": "npm run build",
+    "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "test": "jest"
   },
