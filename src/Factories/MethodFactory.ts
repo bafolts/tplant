@@ -12,6 +12,7 @@ export namespace MethodFactory {
         result.isAbstract = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.AbstractKeyword);
         result.isOptional = ComponentFactory.isOptional(<ts.MethodDeclaration>namedDeclaration);
         result.isStatic = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.StaticKeyword);
+        result.isAsync = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.AsyncKeyword);
         const methodSignature: ts.Signature | undefined = checker.getSignatureFromDeclaration(<ts.MethodDeclaration>namedDeclaration);
         if (methodSignature !== undefined) {
             const returnType: ts.Type = methodSignature.getReturnType();

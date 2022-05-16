@@ -110,6 +110,8 @@ describe('Test commander options', () => {
                     '    -getNaturalColor(thing: Thing, pos: Vector, norm: Vector, rd: Vector, scene: Scene): any',
                     '    +render(scene: any, ctx: any, screenWidth: any, screenHeight: any): void',
                     '}',
+                    '+defaultScene(): Scene',
+                    '+exec(): void',
                     'Ray --> "1" Vector',
                     'Intersection --> "1" Thing',
                     'Intersection --> "1" Ray',
