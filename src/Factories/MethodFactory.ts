@@ -24,7 +24,7 @@ export namespace MethodFactory {
                 result.typeParameters = methodSignature.typeParameters
                     .map(
                         (typeParameter: ts.TypeParameter) =>
-                        TypeParameterFactory.create(typeParameter.symbol, typeParameter.symbol.declarations![0], checker)
+                        TypeParameterFactory.create(typeParameter.symbol, typeParameter.symbol.declarations?.[0], checker)
                     );
             }
         }
