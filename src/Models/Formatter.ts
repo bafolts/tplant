@@ -38,10 +38,7 @@ export abstract class Formatter {
         return [];
     }
 
-    // @ts-ignore
-    public addAssociation(type1: string, cardinality: string, type2: string) : string[] {
-        return [];
-    }
+    public abstract addAssociation(type1: string, cardinality: string, type2: string) : string[];
 
     public serializeFile(file: File) : string {
         const result: string[] = [];
@@ -163,7 +160,7 @@ export abstract class Formatter {
                         }
                         const key: string = `${part.name} ${cardinality} ${typeName}`;
                         if (typeName !== part.name &&
-                            !outputConstraints.hasOwnProperty(key) && mappedTypes.hasOwnProperty(typeName)) {
+                            !Object.prototype.hasOwnProperty.call(outputConstraints, key) && Object.prototype.hasOwnProperty.call(mappedTypes, typeName)) {
                             associations.push(...this.addAssociation(part.name, cardinality, typeName));
                             outputConstraints[key] = true;
                         }

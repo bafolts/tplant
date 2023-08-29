@@ -1,4 +1,4 @@
-import { tplant } from '../../src/tplant';
+import * as tplant from '../../src/tplant';
 import { join } from "path";
 import { readFileSync } from "fs";
 

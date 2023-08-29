@@ -34,6 +34,7 @@
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --sourceMap -w",
+    "lint": "eslint src --ext .ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "test": "jest"
@@ -41,19 +42,25 @@
   "dependencies": {
     "commander": "^6.1.0",
     "glob": "^7.1.6",
+    "node-plantuml": "0.9.0",
     "plantuml-encoder": "^1.4.0",
-    "typescript": "4.0.3",
-    "node-plantuml": "0.9.0"
+    "typescript": "4.0.3"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/jest": "^26.0.24",
     "@types/node": "^12.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.3"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
+  },
+  "engines": {
+    "node": "^16.0.0"
   }
 }
