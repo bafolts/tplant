@@ -5,12 +5,12 @@
 import commander from 'commander';
 import fs from 'fs';
 import G from 'glob';
-import http from 'http';
 import os from 'os';
 import path from 'path';
-import { encode } from 'plantuml-encoder';
 import ts from 'typescript';
 import { tplant } from './tplant';
+import { encode } from 'plantuml-encoder';
+const plantuml = require('node-plantuml');
 
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
@@ -140,16 +140,8 @@ function getCompilerOptions(tsConfigFilePath?: string): ts.CompilerOptions {
 }
 
 function requestImageFile(output: string, input: string, extension: string): void {
-    http.get({
-        host: 'www.plantuml.com',
-        path: `/plantuml/${extension}/${encode(input)}`
-    },       (res: http.IncomingMessage): void => {
-        // tslint:disable-next-line non-literal-fs-path
-        const fileStream: fs.WriteStream = fs.createWriteStream(output);
-        res.setEncoding('utf-8');
-        res.pipe(fileStream);
-        res.on('error', (err: Error): void => {
-            throw err;
-        });
-    });
+    const decode = plantuml.decode(encode(input));
+    const gen = plantuml.generate({ format: extension });
+    decode.out.pipe(gen.in);
+    gen.out.pipe(fs.createWriteStream(output));
 }

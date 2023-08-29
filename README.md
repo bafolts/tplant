@@ -69,5 +69,9 @@ If `mermaid` is specific, then the class diagram is generated for [mermaidjs](ht
 
 If specified will generated the hierarchy class diagram of the specified class
 
+### Graphviz
+
+For generating images may need to install graphviz or update to most recent version.
+
 # References
 https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
