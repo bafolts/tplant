@@ -1,5 +1,5 @@
 
-import { tplant } from '../src/tplant';
+import * as tplant from '../src/tplant';
 
 describe('Parse codes that contains CJK characters', () => {
     it('generate PlantUML for classes that contains CJK characters', () => {

@@ -1,9 +1,0 @@
-{
-    "extends": [
-        "tslint:recommended",
-        "tslint-microsoft-contrib"
-    ],
-    "rules": {
-        "no-relative-imports": false
-    }
-}

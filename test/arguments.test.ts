@@ -1,5 +1,5 @@
 import * as os from 'os';
-import { tplant } from '../src/tplant';
+import * as tplant from '../src/tplant';
 
 describe('Test commander options', () => {
 

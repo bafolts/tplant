@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 
-// tslint:disable:no-console
-
 import commander from 'commander';
 import fs from 'fs';
 import G from 'glob';
 import os from 'os';
 import path from 'path';
 import ts from 'typescript';
-import { tplant } from './tplant';
+import * as tplant from './tplant';
 import { encode } from 'plantuml-encoder';
-const plantuml = require('node-plantuml');
+import pjson = require("../package.json");
 
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+const plantuml = require("node-plantuml");
+
 commander
-    .version(require('../package').version) // tslint:disable-line
+    .version(pjson.version)
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
     .option(
@@ -69,20 +70,17 @@ G(<string>commander.input, {}, (err: Error | null, matches: string[]): void => {
         return;
     }
 
-    // tslint:disable-next-line non-literal-fs-path
     fs.writeFileSync(<string>commander.output, plantUMLDocument, 'utf-8');
 });
 
 function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | undefined {
     if (tsConfigPath !== undefined) {
-        // tslint:disable-next-line non-literal-fs-path
         const tsConfigStats: fs.Stats = fs.statSync(tsConfigPath);
         if (tsConfigStats.isFile()) {
             return tsConfigPath;
         }
         if (tsConfigStats.isDirectory()) {
             const tsConfigFilePath: string = path.resolve(tsConfigPath, 'tsconfig.json');
-            // tslint:disable-next-line non-literal-fs-path
             if (fs.existsSync(tsConfigFilePath)) {
                 return tsConfigFilePath;
             }
@@ -90,13 +88,11 @@ function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | un
     }
 
     const localTsConfigFile: string = path.resolve(path.dirname(inputPath), 'tsconfig.json');
-    // tslint:disable-next-line non-literal-fs-path
     if (fs.existsSync(localTsConfigFile)) {
         return localTsConfigFile;
     }
 
     const cwdTsConfigFile: string = path.resolve(process.cwd(), 'tsconfig.json');
-    // tslint:disable-next-line non-literal-fs-path
     if (fs.existsSync(cwdTsConfigFile)) {
         return cwdTsConfigFile;
     }
@@ -110,7 +106,6 @@ function getCompilerOptions(tsConfigFilePath?: string): ts.CompilerOptions {
     }
 
     const reader: (path: string) => string | undefined =
-        // tslint:disable-next-line non-literal-fs-path
         (filePath: string): string | undefined => fs.readFileSync(filePath, 'utf8');
     const configFile: { config?: { compilerOptions: ts.CompilerOptions }; error?: ts.Diagnostic } =
         ts.readConfigFile(tsConfigFilePath, reader);
