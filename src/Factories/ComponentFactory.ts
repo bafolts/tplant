@@ -81,7 +81,7 @@ export function create(fileName: string, node: ts.Node, checker: ts.TypeChecker)
     return componentComposites;
 }
 
-function getModifier(modifiers: ts.NodeArray<ts.Modifier>): Modifier {
+function getModifier(modifiers: readonly ts.Modifier[]): Modifier {
     for (const modifier of modifiers) {
         if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
             return 'private';
@@ -119,7 +119,7 @@ function getOriginalFile(typeSymbol: ts.Symbol, checker: ts.TypeChecker): string
         deAliasSymbol = typeSymbol;
     }
 
-    return deAliasSymbol.declarations?.[0].getSourceFile().fileName;
+    return deAliasSymbol.declarations?.[0].getSourceFile().fileName ?? '';
 }
 
 export function getOriginalFileOriginalType(tsType: ts.Type, checker: ts.TypeChecker): string {
@@ -160,7 +160,10 @@ function isTypeParameter(declaration: ts.NamedDeclaration): boolean {
 }
 
 export function getMemberModifier(memberDeclaration: ts.Declaration): Modifier {
-    const memberModifiers: ts.NodeArray<ts.Modifier> | undefined = memberDeclaration.modifiers;
+    if (!ts.canHaveModifiers(memberDeclaration)) {
+        return 'public';
+    }
+    const memberModifiers: readonly ts.Modifier[] | undefined = ts.getModifiers(memberDeclaration);
 
     if (memberModifiers === undefined) {
         return 'public';
@@ -171,7 +174,11 @@ export function getMemberModifier(memberDeclaration: ts.Declaration): Modifier {
 
 export function isModifier(memberDeclaration: ts.Declaration, modifierKind: ts.SyntaxKind): boolean {
 
-    const memberModifiers: ts.NodeArray<ts.Modifier> | undefined = memberDeclaration.modifiers;
+    if (!ts.canHaveModifiers(memberDeclaration)) {
+        return false;
+    }
+
+    const memberModifiers: readonly ts.Modifier[] | undefined = ts.getModifiers(memberDeclaration);
 
     if (memberModifiers !== undefined) {
         for (const memberModifier of memberModifiers) {
