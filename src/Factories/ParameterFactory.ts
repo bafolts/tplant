@@ -12,6 +12,10 @@ export function create(parameterSymbol: ts.Symbol, checker: ts.TypeChecker): Par
         declaration = declarations[0];
     }
 
+    if (parameterSymbol.valueDeclaration === undefined) {
+        throw new Error("unable to determine parameterType");
+    }
+
     const typeOfSymbol: ts.Type = checker.getTypeOfSymbolAtLocation(
         parameterSymbol,
         parameterSymbol.valueDeclaration

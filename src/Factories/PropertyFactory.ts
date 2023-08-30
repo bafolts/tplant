@@ -9,6 +9,11 @@ export function create(signature: ts.Symbol, namedDeclaration: ts.NamedDeclarati
     result.isOptional = ComponentFactory.isOptional(<ts.PropertyDeclaration>namedDeclaration);
     result.isStatic = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.StaticKeyword);
     result.isReadonly = ComponentFactory.isModifier(namedDeclaration, ts.SyntaxKind.ReadonlyKeyword);
+
+    if (signature.valueDeclaration === undefined) {
+        throw new Error("unable to determing returnType");
+    }
+
     result.returnType = checker.typeToString(
         checker.getTypeOfSymbolAtLocation(
             signature,
