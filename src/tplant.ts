@@ -10,13 +10,25 @@ import * as FileFactory from './Factories/FileFactory';
 import { MermaidFormat } from './Formatter/MermaidFormat';
 import { ICommandOptions } from './Models/ICommandOptions';
 
+const DEFAULT_FILE_NAME = 'source.ts';
+
 export function generateDocumentation(
-    fileNames: ReadonlyArray<string>,
+    fileNames: ReadonlyArray<string> | string,
     options: ts.CompilerOptions = ts.getDefaultCompilerOptions()
 ): IComponentComposite[] {
 
     // Build a program using the set of root file names in fileNames
-    const program: ts.Program = ts.createProgram(fileNames, options);
+    let program: ts.Program;
+
+    if (Array.isArray(fileNames)) {
+        program = ts.createProgram(fileNames, options);
+    } else {
+        program = ts.createProgram({
+            rootNames: [DEFAULT_FILE_NAME],
+            options,
+            host: getCompilerHostForSource(fileNames as string)
+        });
+    }
 
     // Get the checker, we will use it to find more about classes
     const checker: ts.TypeChecker = program.getTypeChecker();
@@ -35,6 +47,23 @@ export function generateDocumentation(
         });
 
     return result;
+}
+
+function getCompilerHostForSource(source: string): ts.CompilerHost {
+    const sourceFile = ts.createSourceFile(DEFAULT_FILE_NAME, source, ts.ScriptTarget.ES2016);
+    return {
+        getSourceFile: () => sourceFile,
+        getDefaultLibFileName: () => "",
+        writeFile: () => undefined,
+        getCurrentDirectory: () => "",
+        getCanonicalFileName: () => DEFAULT_FILE_NAME,
+        useCaseSensitiveFileNames: () => false,
+        getNewLine: () => "\n",
+        fileExists: () => true,
+        readFile: () => {
+            throw new Error("NOT IMPLEMENTED");
+        }
+    }
 }
 
 export function convertToPlant(files: IComponentComposite[], options: ICommandOptions = {
