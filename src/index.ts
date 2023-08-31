@@ -8,7 +8,6 @@ import path from 'path';
 import ts from 'typescript';
 import * as tplant from './tplant';
 import { encode } from 'plantuml-encoder';
-import pjson = require("../package.json");
 
 const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
@@ -16,7 +15,7 @@ const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 const plantuml = require("node-plantuml");
 
 commander
-    .version(pjson.version)
+    .version("3.1.2")
     .option('-i, --input <path>', 'Define the path of the Typescript file')
     .option('-e, --exclude <path>', 'File(s) to ignore')
     .option('-o, --output <path>', 'Define the path of the output file. If not defined, it\'ll output on the STDOUT')
