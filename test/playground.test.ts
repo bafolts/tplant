@@ -1,18 +1,22 @@
 import * as os from 'os';
+import * as fs from 'fs';
 import * as tplant from '../src/tplant';
 
 describe('Parse Playground codes', () => {
 
     it('generate PlantUML for Abstract/AbstractClass.ts', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Abstract/AbstractClass.ts'])))
-            .toEqual(
-                ['@startuml',
-                    'abstract class AbstractClass {',
-                    '    +{abstract} ToTest(): any',
-                    '    +{abstract} PropTest: number',
-                    '}',
-                    '@enduml'].join(os.EOL)
-            );
+        const fileName = 'test/Playground/Abstract/AbstractClass.ts';
+        const source = fs.readFileSync(fileName).toString();
+        const expectedForAbstractClass = ['@startuml',
+            'abstract class AbstractClass {',
+            '    +{abstract} ToTest(): any',
+            '    +{abstract} PropTest: number',
+            '}',
+            '@enduml'].join(os.EOL);
+        expect(tplant.convertToPlant(tplant.generateDocumentation(source)))
+            .toEqual(expectedForAbstractClass);
+        expect(tplant.convertToPlant(tplant.generateDocumentation([fileName])))
+            .toEqual(expectedForAbstractClass);
     });
 
     it('generate PlantUML for Classes/Greeter.ts', () => {
