@@ -112,6 +112,27 @@ describe('Parse Playground codes', () => {
                     '@enduml'].join(os.EOL));
     });
 
+    it('generate PlantUML in same file', () => {
+        expect(tplant.convertToPlant(tplant.generateDocumentation(`
+            export interface Foo {
+                bar: number;
+                foo: string;
+            }
+            export interface Bar extends Foo {
+                foobar: boolean;
+            }
+        `))).toEqual(
+            ['@startuml',
+                'interface Foo {',
+                '    +bar: number',
+                '    +foo: string',
+                '}',
+                'interface Bar extends Foo {',
+                '    +foobar: boolean',
+                '}',
+            '@enduml'].join(os.EOL));
+    });
+
     it('generate PlantUML for Generics/RecursiveGenericType.ts', () => {
         expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Playground/Generics/RecursiveGenericType.ts'])))
             .toEqual(

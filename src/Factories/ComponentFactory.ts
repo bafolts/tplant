@@ -102,8 +102,9 @@ export function getHeritageClauseNames(heritageClause: ts.HeritageClause, checke
         const symbolAtLocation: ts.Symbol | undefined = checker.getSymbolAtLocation(nodeObject.expression);
         if (symbolAtLocation !== undefined) {
             const ogFile: string = getOriginalFile(symbolAtLocation, checker);
-
-            return [checker.getFullyQualifiedName(symbolAtLocation), ogFile];
+            let qualifiedName = checker.getFullyQualifiedName(symbolAtLocation);
+            qualifiedName = qualifiedName.replace(/"[^"]+"\./, "");
+            return [qualifiedName, ogFile];
         }
 
         return ['', ''];
