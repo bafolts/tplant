@@ -1,6 +1,6 @@
 {
   "name": "tplant",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "Typescript to PlantUML",
   "keywords": [
     "class diagram",
