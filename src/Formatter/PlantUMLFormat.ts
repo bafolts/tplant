@@ -17,7 +17,13 @@ import { IComponentComposite } from '../Models/IComponentComposite';
 export class PlantUMLFormat extends Formatter {
 
     public header(): string[] {
-        return ['@startuml'];
+      const result: string[] = ['@startuml'];
+
+      if (this.options.customization !== undefined) {
+        result.push(`!include ${this.options.customization}`);
+      }
+
+      return result;
     }
 
     public footer(): string[] {

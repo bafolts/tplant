@@ -57,6 +57,14 @@ if (matches.length === 0) {
     process.exit(1);
 }
 
+// check to see if include file exists
+if (options.customize !== undefined) {
+    if (!fs.existsSync(<string>options.customize)) {
+        console.error(`Warning: Customization file ${<string>options.customize} not found.`);
+        process.exit(1);
+    }
+}
+
 const plantUMLDocument: string = tplant.convertToPlant(
     tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
     {
@@ -64,7 +72,8 @@ const plantUMLDocument: string = tplant.convertToPlant(
         onlyInterfaces: <boolean>options.onlyInterfaces,
         format: <string> options.format,
         targetClass: <string> options.targetClass,
-        onlyClasses: <boolean> options.onlyClasses
+        onlyClasses: <boolean> options.onlyClasses,
+        customization: <string> options.customize
     }
 );
 
