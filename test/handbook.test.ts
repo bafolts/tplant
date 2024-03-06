@@ -152,7 +152,7 @@ describe('Parse Handbook codes', () => {
     });
 
     it('generate PlantUML for Interfaces/ExtendingInterfaces.ts', () => {
-        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Handbook/Interfaces/ExtendingInterfaces.ts'])))
+        expect(tplant.convertToPlant(tplant.generateDocumentation(['test/Handbook/Interfaces/ExtendingInterfaces.ts'])).replace(/(\r)/gm,""))
             .toEqual(`@startuml
 interface Shape {
     +color: string

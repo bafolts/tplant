@@ -65,17 +65,19 @@ export function create(fileName: string, node: ts.Node, checker: ts.TypeChecker)
         componentComposites.push(EnumFactory.create(enumSymbol));
 
         return;
-      } else if (childNode.kind === ts.SyntaxKind.FunctionDeclaration) {
-        const currentNode: ts.FunctionDeclaration = <ts.FunctionDeclaration>childNode;
-        if (currentNode.name === undefined) {
-          return;
-        }
-        const functionSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
-        if (functionSymbol === undefined) {
-          return;
-        }
-        componentComposites.push(MethodFactory.create(functionSymbol, currentNode, checker));
       }
+      // Functions are not methods in PlantUML! The (fake) methods (that are functions) get placed in the PlantUML outside of a class, and it won't render.
+      //  else if (childNode.kind === ts.SyntaxKind.FunctionDeclaration) {
+      //   const currentNode: ts.FunctionDeclaration = <ts.FunctionDeclaration>childNode;
+      //   if (currentNode.name === undefined) {
+      //     return;
+      //   }
+      //   const functionSymbol: ts.Symbol | undefined = checker.getSymbolAtLocation(currentNode.name);
+      //   if (functionSymbol === undefined) {
+      //     return;
+      //   }
+      //   componentComposites.push(MethodFactory.create(functionSymbol, currentNode, checker));
+      // }
     });
 
     return componentComposites;

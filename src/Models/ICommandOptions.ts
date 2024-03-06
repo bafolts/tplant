@@ -4,4 +4,5 @@ export interface ICommandOptions {
     onlyInterfaces: boolean;
     format?: string;
     onlyClasses: boolean;
+    customization?: string;  // optional customization file (plantuml include file)
 }

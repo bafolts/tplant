@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import commander from 'commander';
+import Commander from 'commander';
 import fs from 'fs';
-import G from 'glob';
+import { GlobOptions, globSync } from 'glob'
 import os from 'os';
 import path from 'path';
 import ts from 'typescript';
@@ -13,6 +13,8 @@ const AVAILABLE_PLANTUML_EXTENSIONS: string[] = ['svg', 'png', 'txt'];
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const plantuml = require("node-plantuml");
+
+const commander = new Commander.Command();
 
 commander
     .version("3.1.2")
@@ -30,54 +32,67 @@ commander
     .option('-C, --only-classes', 'Only output classes')
     .option('-f, --format <path>', 'Define the format of output')
     .option('-T, --targetClass <className>', 'Display class hierarchy diagram')
+    .option('-c, --customize <path>', 'Customize the output diagram with an included plantuml file')
     .parse(process.argv);
 
-if (!commander.input) {
+const options: Commander.OptionValues = commander.opts();
+
+if (!options.input) {
     console.error('Missing input file');
     process.exit(1);
 }
 
-const globOptions: G.IOptions = {};
+const globOptions: GlobOptions = {};
 
-if (commander.exclude !== undefined) {
-    globOptions.ignore = <string>commander.exclude;
+if (options.exclude !== undefined) {
+    globOptions.ignore = <string>options.exclude;
 }
 
-G(<string>commander.input, globOptions, (err: Error | null, matches: string[]): void => {
-    if (err !== null) {
-        throw err;
+const matches = globSync(<string>options.input, globOptions) as string[];
+
+const tsConfigFile: string | undefined = findTsConfigFile(<string>options.input, <string | undefined>options.tsconfig);
+
+if (matches.length === 0) {
+    console.error('No files found');
+    process.exit(1);
+}
+
+// check to see if include file exists
+if (options.customize !== undefined) {
+    if (!fs.existsSync(<string>options.customize)) {
+        console.error(`Warning: Customization file ${<string>options.customize} not found.`);
+        process.exit(1);
     }
+}
 
-    const tsConfigFile: string | undefined = findTsConfigFile(<string>commander.input, <string | undefined>commander.tsconfig);
-
-    const plantUMLDocument: string = tplant.convertToPlant(
-        tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
-        {
-            associations: <boolean>commander.associations,
-            onlyInterfaces: <boolean>commander.onlyInterfaces,
-            format: <string> commander.format,
-            targetClass: <string> commander.targetClass,
-            onlyClasses: <boolean> commander.onlyClasses
-        }
-    );
-
-    if (commander.output === undefined) {
-        console.log(plantUMLDocument);
-
-        return;
+const plantUMLDocument: string = tplant.convertToPlant(
+    tplant.generateDocumentation(matches, getCompilerOptions(tsConfigFile)),
+    {
+        associations: <boolean>options.associations,
+        onlyInterfaces: <boolean>options.onlyInterfaces,
+        format: <string> options.format,
+        targetClass: <string> options.targetClass,
+        onlyClasses: <boolean> options.onlyClasses,
+        customization: <string> options.customize
     }
+);
 
-    const extension: string = path.extname(<string>commander.output)
-        .replace(/^\./gm, '');
+if (options.output === undefined) {
+    console.log(plantUMLDocument);
 
-    if (AVAILABLE_PLANTUML_EXTENSIONS.includes(extension)) {
-        requestImageFile(<string>commander.output, plantUMLDocument, extension);
+    process.exit(0);
+}
 
-        return;
-    }
+const extension: string = path.extname(<string>options.output)
+    .replace(/^\./gm, '');
 
-    fs.writeFileSync(<string>commander.output, plantUMLDocument, 'utf-8');
-});
+if (AVAILABLE_PLANTUML_EXTENSIONS.includes(extension)) {
+    requestImageFile(<string>options.output, plantUMLDocument, extension);
+
+    process.exit(0);
+}
+
+fs.writeFileSync(<string>options.output, plantUMLDocument, 'utf-8');
 
 function findTsConfigFile(inputPath: string, tsConfigPath?: string): string | undefined {
     if (tsConfigPath !== undefined) {
